@@ -32,8 +32,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar:
             PreferredSize(child: AppBar(), preferredSize: Size.fromHeight(0)),
-        body: ChangeNotifierProvider<BoardConstants>(
-          builder: (_) => BoardConstants(context),
+        body: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<BoardConstants>(
+                builder: (_) => BoardConstants(context)),
+          ],
           child: GameBoard(),
         ));
   }
