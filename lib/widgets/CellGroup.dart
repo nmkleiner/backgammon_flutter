@@ -14,13 +14,13 @@ class CellGroup extends StatelessWidget {
         children: isReversed
             ? <Widget>[
                 ...cells
-                    .map((cellId) => Cell(id: cellId, isMiddleCell: false, isExitCell: false))
+                    .map((cellId) => Cell(id: cellId))
                     .toList()
                     .reversed
               ]
             : <Widget>[
                 ...cells
-                    .map((cellId) => Cell(id: cellId, isMiddleCell: false, isExitCell: false,))
+                    .map((cellId) => Cell(id: cellId))
                     .toList()
               ]);
   }

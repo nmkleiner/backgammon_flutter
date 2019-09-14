@@ -9,21 +9,16 @@ class Cell extends StatelessWidget {
   final bool isMiddleCell;
   final bool isExitCell;
 
-  Cell({this.id, this.isMiddleCell, this.isExitCell});
+  Cell({this.id, this.isMiddleCell: false, this.isExitCell: false});
 
   @override
   Widget build(BuildContext context) {
     if (isMiddleCell) {
-      return  MiddleCell(
-          id: id);
+      return MiddleCell(id: id);
     } else if (isExitCell) {
-      return  ExitCell(
-          id: id);
-    }
-    else {
-      return TriangleCell(
-          id: id,
-          isRotated: id > 12);
+      return ExitCell(id: id);
+    } else {
+      return TriangleCell(id: id, isRotated: id > 12);
     }
   }
 }

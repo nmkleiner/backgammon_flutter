@@ -13,7 +13,7 @@ class MiddleCell extends StatelessWidget {
     return Container(
       height: cells.rowHeight,
       width: cells.middleCellWidth,
-      color: Colors.deepOrange,
+      color: Color.fromRGBO(160, 110, 44, 1),
       child: Text(
         id.toString(),
         style: TextStyle(color: Colors.yellowAccent),

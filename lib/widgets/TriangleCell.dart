@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 class TriangleCell extends StatelessWidget {
   final int id;
   final isRotated;
-  Color color;
 
-  TriangleCell({this.id, this.isRotated}) {
-    color = id % 2 == 0 ? Colors.black : Colors.red;
+  TriangleCell({this.id, this.isRotated});
+
+  Color get color {
+    return id % 2 == 0 ? Colors.black : Colors.red;
   }
 
   @override

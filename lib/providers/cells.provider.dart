@@ -40,12 +40,12 @@ class Cells with ChangeNotifier {
 
   Cells(this.context) {
     screenSize = MediaQuery.of(context).size;
-    width = screenSize.width;
-    height = screenSize.height;
+    width = screenSize.width - 20; // minus border
+    height = screenSize.height - 19; // minus border
     rowHeight = (height - 25) / 2;
     cellWidth = width / 14;
     cellHeight = height / 2.5;
-    exitCellWidth = width / 16;
+    exitCellWidth = width / 16 + 12;
     middleCellWidth = width / 16;
   }
 }
