@@ -1,4 +1,4 @@
-import 'package:backgammon/providers/cells.provider.dart';
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +8,7 @@ class ExitCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cells = Provider.of<Cells>(context);
+    final cells = Provider.of<BoardConstants>(context, listen: false);
     return Container(
       width: cells.exitCellWidth,
       height: cells.rowHeight,

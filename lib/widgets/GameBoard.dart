@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/cells.provider.dart';
+import '../providers/BoardConstants.provider.dart';
 import 'Cell.dart';
-import 'dices/Dices.dart';
+// import 'dices/Dices.dart';
 import 'CellGroup.dart';
 
 class GameBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final cells = Provider.of<Cells>(context);
+    final cells = Provider.of<BoardConstants>(context, listen: false);
 
     return Container(
       decoration: BoxDecoration(
@@ -41,7 +41,7 @@ class GameBoard extends StatelessWidget {
             )
           ],
         ),
-        Dices(),
+        // Dices(),
       ]),
     );
   }
