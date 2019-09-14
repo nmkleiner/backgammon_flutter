@@ -1,4 +1,4 @@
-import 'package:backgammon/providers/cells.provider.dart';
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:backgammon/widgets/GameBoard.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar:
             PreferredSize(child: AppBar(), preferredSize: Size.fromHeight(0)),
-        body: ChangeNotifierProvider<Cells>(
-          builder: (_) => Cells(context),
+        body: ChangeNotifierProvider<BoardConstants>(
+          builder: (_) => BoardConstants(context),
           child: GameBoard(),
         ));
   }

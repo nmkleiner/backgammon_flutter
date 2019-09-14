@@ -1,6 +1,6 @@
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/cells.provider.dart';
 import 'Cell.dart';
 import 'dices/Dices.dart';
 import 'CellGroup.dart';
@@ -8,7 +8,7 @@ import 'CellGroup.dart';
 class GameBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final cells = Provider.of<Cells>(context);
+    final boardConstants = Provider.of<BoardConstants>(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -25,18 +25,18 @@ class GameBoard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Cell(id: 0, isExitCell: true),
-                CellGroup(cells.cellIds.sublist(0, 6), false),
+                CellGroup( boardConstants.cellIds.sublist(0, 6), false),
                 Cell(id: 26, isMiddleCell: true),
-                CellGroup(cells.cellIds.sublist(6, 12), false),
+                CellGroup( boardConstants.cellIds.sublist(6, 12), false),
               ],
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Cell(id: 25, isMiddleCell: false, isExitCell: true),
-                CellGroup(cells.cellIds.sublist(18, 24), true),
+                CellGroup( boardConstants.cellIds.sublist(18, 24), true),
                 Cell(id: 27, isMiddleCell: true, isExitCell: false),
-                CellGroup(cells.cellIds.sublist(12, 18), true),
+                CellGroup( boardConstants.cellIds.sublist(12, 18), true),
               ],
             )
           ],

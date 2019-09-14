@@ -1,4 +1,4 @@
-import 'package:backgammon/providers/cells.provider.dart';
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -9,10 +9,10 @@ class MiddleCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cells = Provider.of<Cells>(context);
+    final boardConstants = Provider.of<BoardConstants>(context);
     return Container(
-      height: cells.rowHeight,
-      width: cells.middleCellWidth,
+      height: boardConstants.rowHeight,
+      width: boardConstants.middleCellWidth,
       color: Color.fromRGBO(160, 110, 44, 1),
       child: Text(
         id.toString(),

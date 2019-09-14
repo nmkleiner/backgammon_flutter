@@ -1,4 +1,4 @@
-import 'package:backgammon/providers/cells.provider.dart';
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -14,14 +14,14 @@ class TriangleCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cells = Provider.of<Cells>(context);
+    final boardConstants = Provider.of<BoardConstants>(context);
     return RotatedBox(
       quarterTurns: isRotated ? 2 : 0,
       child: ClipPath(
         clipper: TriangleClipper(),
         child: Container(
-          width: cells.cellWidth,
-          height: cells.cellHeight,
+          width: boardConstants.cellWidth,
+          height: boardConstants.cellHeight,
           color: color,
           child: Text(
             id.toString(),
