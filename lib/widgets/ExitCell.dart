@@ -11,12 +11,17 @@ class ExitCell extends StatelessWidget {
     final boardConstants = Provider.of<BoardConstants>(context);
     return Container(
       width: boardConstants.exitCellWidth,
-      height: boardConstants.rowHeight,
+      height: boardConstants.rowHeight + 10,
       decoration: BoxDecoration(
-          border: Border.all(
-        color: Colors.black,
-        width: 1,
-      )),
+        border: Border.all(
+          color: Colors.black,
+          width: 1,
+        ),
+      ),
+      child: Text(
+        id.toString(),
+        style: TextStyle(color: Colors.blue),
+      ),
     );
   }
 }

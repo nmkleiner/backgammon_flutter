@@ -3,7 +3,9 @@
 
 V-dices entity
 V-cell entity
--dices animations
+V-dices animations
+V-exit cells outside of board
+
 
 -soldier entity
 -soldier widget
