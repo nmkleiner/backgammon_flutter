@@ -17,22 +17,30 @@ class TriangleCell extends StatelessWidget {
     final boardConstants = Provider.of<BoardConstants>(context);
     return RotatedBox(
       quarterTurns: isRotated ? 2 : 0,
-      child: ClipPath(
-        clipper: TriangleClipper(),
-        child: Container(
-          width: boardConstants.cellWidth,
-          height: boardConstants.cellHeight,
-          color: color,
-          child: Text(
-            id.toString(),
-            style: TextStyle(fontSize: 26, color: Colors.yellow),
-          ),
+      child: Container(
+        height: boardConstants.rowHeight,
+        child: Column(
+          children: <Widget>[
+            ClipPath(
+              clipper: TriangleClipper(),
+              child: Container(
+                width: boardConstants.cellWidth,
+                height: boardConstants.cellHeight,
+                color: color,
+                child: Text(
+                  id.toString(),
+                  style: TextStyle(fontSize: 26, color: Colors.yellow),
+                ),
+              ),
+            ),
+            SizedBox(
+                height: boardConstants.rowHeight - boardConstants.cellHeight)
+          ],
         ),
       ),
     );
   }
 }
-
 
 class TriangleClipper extends CustomClipper<Path> {
   @override
@@ -47,4 +55,3 @@ class TriangleClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(TriangleClipper oldClipper) => false;
 }
-

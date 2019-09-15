@@ -2,7 +2,6 @@ import 'package:backgammon/providers/Game.provider.dart';
 import 'package:backgammon/widgets/ActionButtons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'Cell.dart';
 import 'dices/Dices.dart';
 import 'CellGroup.dart';
 
@@ -25,19 +24,13 @@ class GameBoard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                CellGroup(cells: gameProvider.cells.sublist(8, 14), isReversed: true),
-                Cell(gameProvider.cells[7]),
-                CellGroup(cells: gameProvider.cells.sublist(1, 7), isReversed: true),
-                Cell(gameProvider.cells[0]),
+                CellGroup(cells: gameProvider.cells.sublist(0, 14), isReversed: true),
               ],
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                CellGroup(cells: gameProvider.cells.sublist(14, 20)),
-                Cell(gameProvider.cells[20]),
-                CellGroup(cells: gameProvider.cells.sublist(21, 27)),
-                Cell(gameProvider.cells[27]),
+                CellGroup(cells: gameProvider.cells.sublist(14, 27)),
               ],
             )
           ],
