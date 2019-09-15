@@ -1,9 +1,10 @@
+import 'package:backgammon/entities/CellEntity.dart';
 import 'package:flutter/material.dart';
 
 import 'Cell.dart';
 
 class CellGroup extends StatelessWidget {
-  final List<int> cells;
+  final List<CellEntity> cells;
   final bool isReversed;
 
   CellGroup(this.cells, this.isReversed);
@@ -14,13 +15,13 @@ class CellGroup extends StatelessWidget {
         children: isReversed
             ? <Widget>[
                 ...cells
-                    .map((cellId) => Cell(id: cellId))
+                    .map((cell) => Cell(id: cell.id))
                     .toList()
                     .reversed
               ]
             : <Widget>[
                 ...cells
-                    .map((cellId) => Cell(id: cellId))
+                    .map((cell) => Cell(id: cell.id))
                     .toList()
               ]);
   }
