@@ -28,6 +28,6 @@ class BoardConstants with ChangeNotifier {
     middleCellWidth = width / 16;
     rowWidth = (width - middleCellWidth - exitCellWidth - 20) / 2;
     actionButtonLeft = rowWidth * 1.4 + middleCellWidth - 5;
-    actionButtonTop = rowHeight - 10 - 13;
+    actionButtonTop = rowHeight - 13;
   }
 }
