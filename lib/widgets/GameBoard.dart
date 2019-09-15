@@ -25,19 +25,19 @@ class GameBoard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Cell(id: 0, isExitCell: true),
-                CellGroup(gameProvider.cellIds.sublist(0, 6), false),
-                Cell(id: 26, isMiddleCell: true),
-                CellGroup(gameProvider.cellIds.sublist(6, 12), false),
+                CellGroup(cells: gameProvider.cells.sublist(8, 14), isReversed: true),
+                Cell(gameProvider.cells[7]),
+                CellGroup(cells: gameProvider.cells.sublist(1, 7), isReversed: true),
+                Cell(gameProvider.cells[0]),
               ],
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Cell(id: 25, isMiddleCell: false, isExitCell: true),
-                CellGroup(gameProvider.cellIds.sublist(18, 24), true),
-                Cell(id: 27, isMiddleCell: true, isExitCell: false),
-                CellGroup(gameProvider.cellIds.sublist(12, 18), true),
+                CellGroup(cells: gameProvider.cells.sublist(14, 20)),
+                Cell(gameProvider.cells[20]),
+                CellGroup(cells: gameProvider.cells.sublist(21, 27)),
+                Cell(gameProvider.cells[27]),
               ],
             )
           ],

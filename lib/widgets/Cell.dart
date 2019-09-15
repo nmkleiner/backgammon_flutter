@@ -1,3 +1,4 @@
+import 'package:backgammon/entities/CellEntity.dart';
 import 'package:flutter/material.dart';
 
 import 'ExitCell.dart';
@@ -5,20 +6,18 @@ import 'MiddleCell.dart';
 import 'TriangleCell.dart';
 
 class Cell extends StatelessWidget {
-  final int id;
-  final bool isMiddleCell;
-  final bool isExitCell;
+  final CellEntity cell;
 
-  Cell({this.id, this.isMiddleCell: false, this.isExitCell: false});
+  Cell(this.cell);
 
   @override
   Widget build(BuildContext context) {
-    if (isMiddleCell) {
-      return MiddleCell(id: id);
-    } else if (isExitCell) {
-      return ExitCell(id: id);
+    if (cell.isMiddleCell) {
+      return MiddleCell(id: cell.id);
+    } else if (cell.isExitCell) {
+      return ExitCell(id: cell.id);
     } else {
-      return TriangleCell(id: id, isRotated: id > 12);
+      return TriangleCell(id: cell.id, isRotated: cell.id > 12);
     }
   }
 }

@@ -7,22 +7,13 @@ class CellGroup extends StatelessWidget {
   final List<CellEntity> cells;
   final bool isReversed;
 
-  CellGroup(this.cells, this.isReversed);
+  CellGroup({this.cells, this.isReversed: false});
 
   @override
   Widget build(BuildContext context) {
     return Row(
         children: isReversed
-            ? <Widget>[
-                ...cells
-                    .map((cell) => Cell(id: cell.id))
-                    .toList()
-                    .reversed
-              ]
-            : <Widget>[
-                ...cells
-                    .map((cell) => Cell(id: cell.id))
-                    .toList()
-              ]);
+            ? <Widget>[...cells.map((cell) => Cell(cell)).toList().reversed]
+            : <Widget>[...cells.map((cell) => Cell(cell)).toList()]);
   }
 }
