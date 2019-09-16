@@ -15,6 +15,5 @@ class CellEntity {
       this.blackHouse: false,
       this.isMiddleCell: false,
       this.isExitCell: false,
-      this.soldiers
       });
 }
