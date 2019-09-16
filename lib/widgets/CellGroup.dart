@@ -1,4 +1,4 @@
-import 'package:backgammon/entities/CellEntity.dart';
+import 'package:backgammon/entities/Cell.entity.dart';
 import 'package:flutter/material.dart';
 
 import 'Cell.dart';

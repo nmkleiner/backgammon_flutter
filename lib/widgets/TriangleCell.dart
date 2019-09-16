@@ -1,15 +1,19 @@
+import 'package:backgammon/entities/Soldier.entity.dart';
 import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-class TriangleCell extends StatelessWidget {
-  final int id;
-  final isRotated;
+import 'Soldier.dart';
 
-  TriangleCell({this.id, this.isRotated});
+class TriangleCell extends StatelessWidget {
+  final String id;
+  final isRotated;
+  final List<SoldierEntity> soldiers;
+
+  TriangleCell({this.id, this.isRotated, this.soldiers});
 
   Color get color {
-    return id % 2 == 0 ? Colors.black : Colors.red;
+    return int.parse(id) % 2 == 0 ? Colors.black : Colors.red;
   }
 
   @override
@@ -17,26 +21,40 @@ class TriangleCell extends StatelessWidget {
     final boardConstants = Provider.of<BoardConstants>(context);
     return RotatedBox(
       quarterTurns: isRotated ? 2 : 0,
-      child: Container(
-        height: boardConstants.rowHeight,
-        child: Column(
-          children: <Widget>[
-            ClipPath(
-              clipper: TriangleClipper(),
-              child: Container(
-                width: boardConstants.cellWidth,
-                height: boardConstants.cellHeight,
-                color: color,
-                child: Text(
-                  id.toString(),
-                  style: TextStyle(fontSize: 26, color: Colors.yellow),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            height: boardConstants.rowHeight,
+            child: Column(
+              children: <Widget>[
+                ClipPath(
+                  clipper: TriangleClipper(),
+                  child: Container(
+                    width: boardConstants.cellWidth,
+                    height: boardConstants.cellHeight,
+                    color: color,
+                    child: Text(
+                      id,
+                      style: TextStyle(fontSize: 26, color: Colors.yellow),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(
+                    height:
+                        boardConstants.rowHeight - boardConstants.cellHeight)
+              ],
             ),
-            SizedBox(
-                height: boardConstants.rowHeight - boardConstants.cellHeight)
-          ],
-        ),
+          ),
+          Container(
+            width: boardConstants.cellWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)).toList(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

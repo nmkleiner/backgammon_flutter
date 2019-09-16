@@ -15,6 +15,7 @@ class BoardConstants with ChangeNotifier {
   double rowWidth;
   double actionButtonLeft;
   double actionButtonTop;
+  double soldierRadius;
   
 
   BoardConstants(this.context) {
@@ -29,5 +30,6 @@ class BoardConstants with ChangeNotifier {
     rowWidth = (width - middleCellWidth - exitCellWidth - 20) / 2;
     actionButtonLeft = rowWidth * 1.4 + middleCellWidth - 5;
     actionButtonTop = rowHeight - 13;
+    soldierRadius = cellHeight / 10;
   }
 }

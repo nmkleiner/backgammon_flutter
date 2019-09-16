@@ -48,7 +48,7 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
     return Container(
       height: double.infinity,
       width: boardConstants.rowWidth,
-      margin: EdgeInsets.only(left: boardConstants.cellWidth * 0.1),
+      margin: EdgeInsets.only(left: boardConstants.cellWidth * 0.3),
       padding: EdgeInsets.symmetric(horizontal: boardConstants.cellWidth * 1.6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
