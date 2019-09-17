@@ -10,14 +10,14 @@ class GameProvider with ChangeNotifier {
   SoldierEntity selectedSoldier;
   CellEntity selectedSoldierCell;
   bool thereIsSelectedSoldier = false;
-  Color currentTurn = Colors.white;
+  Color currentTurn = Colors.black;
   // possibleMoves
   bool duringTurn = false;
   Map loggedInUser = {
     'name': 'noam',
     'id': '123',
     'pic': '.jpg',
-    'color': Colors.white
+    'color': Colors.black
   };
   bool winner = false;
   bool isMars = false;
@@ -65,12 +65,12 @@ class GameProvider with ChangeNotifier {
   Map<String, Map<String, dynamic>> boardMap = {
     '1': {'amount': 2, 'color': Colors.white},
     '6': {'amount': 5, 'color': Colors.black},
-    '9': {'amount': 3, 'color': Colors.black},
-    '13': {'amount': 5, 'color': Colors.white},
-    '14': {'amount': 5, 'color': Colors.black},
-    '18': {'amount': 3, 'color': Colors.white},
-    '21': {'amount': 5, 'color': Colors.white},
-    '26': {'amount': 2, 'color': Colors.black},
+    '8': {'amount': 3, 'color': Colors.black},
+    '12': {'amount': 5, 'color': Colors.white},
+    '13': {'amount': 5, 'color': Colors.black},
+    '17': {'amount': 3, 'color': Colors.white},
+    '19': {'amount': 5, 'color': Colors.white},
+    '24': {'amount': 2, 'color': Colors.black},
   };
 
   GameProvider() {
@@ -130,13 +130,13 @@ class GameProvider with ChangeNotifier {
   }
 
   void _setBoard() {
-    boardMap.forEach((String cellId, Map value) {
-      List<SoldierEntity> soldiers =
-          _createSoldiers(boardMap[cellId]['amount'], boardMap[cellId]['color'])
-              .toList();
+    boardMap.forEach((String cellIndex, Map value) {
+      List<SoldierEntity> soldiers = _createSoldiers(
+              boardMap[cellIndex]['amount'], boardMap[cellIndex]['color'])
+          .toList();
       soldiers.forEach((soldier) {
-        cells[int.parse(cellId)].soldiers.add(soldier);
-        soldier.cellId = cellId;
+        _getCellById(cellIndex).soldiers.add(soldier);
+        soldier.cellId = cellIndex;
       });
     });
   }
@@ -152,60 +152,172 @@ class GameProvider with ChangeNotifier {
 
   void _calculatePossibleMoves() {
     List<SoldierEntity> soldiers = _possibleSoldiers;
-    print('relevantSoldiers : ');
-    print(soldiers.map((soldier) => soldier.id));
+    print('dices: ${dices[0].number} ${dices[1].number}');
     int direction = currentTurn == Colors.white ? 1 : -1;
-    List possibleMoves = [];
+    // List<int> possibleMoves = [];
     soldiers.forEach((soldier) {
       CellEntity source = _getCellById(soldier.cellId);
-      var soldierMoves = [];
+      List<int> soldierMoves = [];
       soldierMoves = _calculateNaiveSoldierMoves(source, direction);
-      print(soldier.cellId);
-      print(soldierMoves);
+      print('----calculated naive soldier moves: $soldierMoves');
+      soldierMoves = _removeSrcCellMoves(soldierMoves, source);
+      // print('----removed source cell moves: $soldierMoves');
+      soldierMoves = _removeOpponentHousesMoves(soldierMoves);
+      print('----removed opponent house moves: $soldierMoves');
+      soldierMoves = _removeBasedOnHousesMoves(soldierMoves);
+      print('----removed based on opponent house moves: $soldierMoves');
+      soldierMoves = _removeBasedOnOutsideMoves(soldierMoves);
+      print('----removed based on outside moves: $soldierMoves');
+      soldierMoves = _removeExitMoves(soldierMoves);
+      print('----removed exit moves: $soldierMoves');
+      print('             ');
     });
   }
 
   _calculateNaiveSoldierMoves(CellEntity source, int direction) {
-    var moves = [];
+    List<int> moves = [];
     bool isGettingOut = true;
-    int srcCellIndex = _getCellIndex(source.id);
-    print('dices in calculation time');
-    print(dices[0].number);
-    print(dices[1].number);
+    int srcCellIndex = _getCellIndexFromId(source.id);
+    int num1 = dices[0].number;
+    int num2 = dices[1].number;
+
     if (srcCellIndex != 0 && srcCellIndex != 25) {
       isGettingOut = false;
     }
-    // if (!dices.doubleCount) {
-    if (dices[0].isUsed && dices[1].isUsed) {
-      moves = [];
-    } else if (!isGettingOut) {
-      moves = [
-        srcCellIndex + direction * dices[0].number,
-        srcCellIndex + direction * dices[1].number,
-        srcCellIndex + direction * (dices[0].number + dices[1].number)
-      ];
+    if (doubleCount == 0) {
+      if (dices[0].isUsed && dices[1].isUsed) {
+        moves = [];
+      } else if (!isGettingOut) {
+        moves = [
+          srcCellIndex + direction * num1,
+          srcCellIndex + direction * num2,
+          srcCellIndex + direction * (num1 + num2)
+        ];
+      } else {
+        moves = [
+          srcCellIndex + direction * num1,
+          srcCellIndex + direction * num2,
+          null
+        ];
+      }
     } else {
-      moves = [
-        srcCellIndex + direction * dices[0].number,
-        srcCellIndex + direction * dices[1].number,
-        null
-      ];
+      for (int i = 1; i <= doubleCount; i++) {
+        moves.add(srcCellIndex + direction * num1 * i);
+      }
     }
-    // } else {
-    // for (let i = 1; i <= dices.doubleCount; i++) {
-    //     moves.push(source.id + direction * dices.num1 * i)
-    // }
-    // }
+    return moves.toList();
+  }
+
+  List<int> _removeSrcCellMoves(List<int> moves, CellEntity source) {
+    int srcCellIndex = _getCellIndexFromId(source.id);
+    return moves.map((move) => (move == srcCellIndex) ? null : move).toList();
+  }
+
+  List<int> _removeOpponentHousesMoves(List<int> moves) {
+    return moves
+        .map((cellIndex) => _isOpponentHouse(cellIndex) ? null : cellIndex)
+        .toList();
+  }
+
+  List<int> _removeBasedOnHousesMoves(List<int> moves) {
+    if (doubleCount == 0) {
+      if (moves[0] == null && moves[1] == null) {
+        moves[2] = null;
+      }
+    } else {
+      int index = moves.indexWhere((move) => move == null);
+      if (index != -1) {
+        for (var i = 0; i < moves.length; i++) {
+          if (i > index) {
+            moves[i] = null;
+          }
+        }
+      }
+    }
     return moves;
   }
 
-  int _getCellIndex(String cellId) {
-    if (cellId == 'whiteMiddleCell') {
-      return 0;
-    } else if (cellId == 'blackMiddleCell') {
-      return 25;
+  List<int> _removeBasedOnOutsideMoves(List<int> moves) {
+    moves = moves.map((move) {
+      if (move == null) {
+        return null;
+      } else if (move > 25) {
+        return 25;
+      } else if (move < 0) {
+        return 0;
+      } else {
+        return move;
+      }
+    }).toList();
+    int index = moves.indexWhere((move) => move == 25 || move == 0);
+    if (index != -1) {
+      for (var i = 0; i < moves.length; i++) {
+        if (i > index) {
+          moves[i] = null;
+        }
+      }
+    }
+    return moves;
+  }
+
+  List<int> _removeExitMoves(List<int> moves) {
+    if (_canExit) {
+      return moves;
     } else {
-      return int.parse(cellId);
+      return moves
+          .map((move) => (move == null || move >= 25 || move <= 0) ? null : move)
+          .toList();
+    }
+  }
+
+  bool _isOpponentHouse(int cellIndex) {
+    if (cellIndex == null) {
+      return false;
+    }
+    if (cellIndex > 24 || cellIndex < 1) {
+      return false;
+    }
+    String cellId = _getCellIdFromIndex(cellIndex);
+    CellEntity cell = _getCellById(cellId);
+    return currentTurn == Colors.white && cell.isHouseOf(Colors.black) ||
+        currentTurn == Colors.black && cell.isHouseOf(Colors.white);
+  }
+
+  bool get _canExit {
+    List _cells = currentTurn == Colors.white
+        ? cells.sublist(21, 27)
+        : cells.sublist(1, 7);
+    int count = 0;
+    _cells.forEach((cell) {
+      cell.soldiers.forEach((soldier) {
+        if (soldier.color == currentTurn) count++;
+      });
+    });
+    return count == 15;
+  }
+
+  int _getCellIndexFromId(String cellId) {
+    switch (cellId) {
+      case 'whiteExitCell':
+        return 25;
+      case 'blackExitCell':
+        return 0;
+      case 'whiteMiddleCell':
+        return 0;
+      case 'blackMiddleCell':
+        return 25;
+      default:
+        return int.parse(cellId);
+    }
+  }
+
+  String _getCellIdFromIndex(int cellIndex) {
+    if (cellIndex == 0) {
+      return 'whiteMiddleCell';
+    } else if (cellIndex == 25) {
+      return 'blackMiddleCell';
+    } else {
+      return cellIndex.toString();
     }
   }
 
@@ -258,10 +370,20 @@ class GameProvider with ChangeNotifier {
 
     Future.delayed(const Duration(milliseconds: 700), () {
       dicesRolling = false;
+      // force doubles
+      // dices[0].number = dices[1].number;
+      // dices[0].number = 1;
+      // dices[1].number = 1;
+      notifyListeners();
       _swapDices();
+      _setDoubleCount();
       _calculatePossibleMoves();
       notifyListeners();
     });
+  }
+
+  void _setDoubleCount() {
+    doubleCount = dices[0].number == dices[1].number ? 4 : 0;
   }
 
   void _swapDices() {
@@ -278,8 +400,8 @@ class GameProvider with ChangeNotifier {
       Duration(milliseconds: 60),
       (timer) => {
         _counter++,
-        if (_counter > 5) {timer.cancel()},
-        dice.number = math.Random().nextInt(7),
+        if (_counter == 2) {timer.cancel()},
+        dice.number = math.Random().nextInt(6) + 1,
         notifyListeners()
       },
     );
