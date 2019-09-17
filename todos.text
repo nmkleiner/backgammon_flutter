@@ -11,7 +11,7 @@ V-make sure soldiers appear in correct order and position in all cell types
 V-soldier widget
 V-wrap cell with gesturedetector
 *-soldier entity {id, color, possibleMoves, isEaten, isOut, isSelected, isLastInCell?, isMoving}
---->-create soldiers on board
+V-create soldiers on board
 
 -game logic provider:
 -open gameService from backgammon-vue and create a list of steps to implement

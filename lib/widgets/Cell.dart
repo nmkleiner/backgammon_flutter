@@ -1,5 +1,7 @@
 import 'package:backgammon/entities/Cell.entity.dart';
+import 'package:backgammon/providers/Game.provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'ExitCell.dart';
 import 'MiddleCell.dart';
@@ -31,10 +33,11 @@ class Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gameProvider = Provider.of<GameProvider>(context);
     return GestureDetector(
       child: cellType,
       onTap: () {
-        print(cell.id);
+        gameProvider.onCellClick(cell.id);
       },
     );
   }

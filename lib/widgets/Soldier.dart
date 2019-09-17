@@ -8,18 +8,29 @@ class Soldier extends StatelessWidget {
 
   Soldier(this.soldier);
 
+  Color get _soldierColor {
+    if (soldier.isSelected) {
+      return Colors.yellowAccent;
+    } else {
+      return soldier.color == Colors.white ? Colors.black : Colors.white;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-final boardConstants = Provider.of<BoardConstants>(context);
-        return Container(
-          height: boardConstants.soldierRadius * 2,
-          width: boardConstants.soldierRadius * 2,
-          decoration: BoxDecoration(
-            color: soldier.color,
-            borderRadius: BorderRadius.circular(boardConstants.soldierRadius),
-          ),
-          child: Text(soldier.id.toString(), style: TextStyle(color: Colors.blueAccent, fontSize: 20),),
-        );
-      }
-    }
-  
+    final boardConstants = Provider.of<BoardConstants>(context);
+    return Container(
+      height: boardConstants.soldierRadius * 2,
+      width: boardConstants.soldierRadius * 2,
+      decoration: BoxDecoration(
+        color: soldier.color,
+        borderRadius: BorderRadius.circular(boardConstants.soldierRadius),
+        border: Border.all(color: _soldierColor, width: 2),
+      ),
+      child: Text(
+        soldier.id.toString(),
+        style: TextStyle(color: Colors.blueAccent, fontSize: 20),
+      ),
+    );
+  }
+}

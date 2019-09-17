@@ -1,6 +1,5 @@
 import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:backgammon/providers/Game.provider.dart';
-import 'package:backgammon/providers/Dices.provider.dart';
 import 'package:provider/provider.dart';
 import 'package:backgammon/widgets/GameBoard.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +37,6 @@ class _MyHomePageState extends State<MyHomePage> {
           providers: [
             ChangeNotifierProvider<BoardConstants>(
                 builder: (_) => BoardConstants(context)),
-            ChangeNotifierProvider<DicesProvider>(
-                builder: (_) => DicesProvider()),
             ChangeNotifierProvider<GameProvider>(
               builder: (_) => GameProvider(),
             )

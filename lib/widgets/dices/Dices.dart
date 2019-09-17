@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:backgammon/providers/Game.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../entities/Dice.entity.dart';
 import '../../providers/BoardConstants.provider.dart';
-import '../../providers/Dices.provider.dart';
 import './Dice.dart';
 
 class Dices extends StatefulWidget {
@@ -39,10 +39,10 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final boardConstants = Provider.of<BoardConstants>(context, listen: false);
-    final dicesProvider = Provider.of<DicesProvider>(context);
-    if (dicesProvider.dicesRolling) {
-      _rollDice(dicesProvider.dices[0]);
-      _rollDice(dicesProvider.dices[1]);
+    final gameProvider = Provider.of<GameProvider>(context);
+    if (gameProvider.dicesRolling) {
+      _rollDice(gameProvider.dices[0]);
+      _rollDice(gameProvider.dices[1]);
     }
 
     return Container(
@@ -53,8 +53,8 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Dice(_angleAnimation, dicesProvider.dices[0].number),
-          Dice(_angleAnimation, dicesProvider.dices[1].number),
+          Dice(_angleAnimation, gameProvider.dices[0].number),
+          Dice(_angleAnimation, gameProvider.dices[1].number),
         ],
       ),
     );
