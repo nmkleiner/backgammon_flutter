@@ -148,10 +148,58 @@ class GameProvider with ChangeNotifier {
     return soldiers;
   }
 
+  void _calculatePossibleMoves() {
+    List<SoldierEntity> soldiers = _possibleSoldiers;
+    print(soldiers.map((soldier) => soldier.id));
+    int direction = currentTurn == Colors.white ? 1 : -1;
+  }
+
+  List<SoldierEntity> get _possibleSoldiers {
+    List<SoldierEntity> soldiers = _lastInCellSoldiers;
+    CellEntity middleCell = currentTurn == Colors.white
+        ? _getCellById('whiteMiddleCell')
+        : _getCellById('blackMiddleCell');
+    String exitCellId =
+        currentTurn == Colors.white ? 'whiteExitCell' : 'blackExitCell';
+    if (!_hasEatenSoldiers) {
+      //  get soldiers that it's their turn and are not outside board
+      return soldiers.where((soldier) {
+        return (soldier.color == currentTurn) && (soldier.cellId != exitCellId);
+      }).toList();
+    } else {
+      // get soldiers from middleCell
+      return [middleCell.soldiers.last];
+    }
+  }
+
+  bool get _hasEatenSoldiers {
+    CellEntity middleCell = currentTurn == Colors.white
+        ? _getCellById('whiteMiddleCell')
+        : _getCellById('blackMiddleCell');
+    return middleCell.soldiers.isNotEmpty;
+  }
+
+  List<SoldierEntity> get _allSoldiers {
+    List<SoldierEntity> res = [];
+    cells.map((CellEntity cell) => cell.soldiers).forEach((soldiers) => {
+          soldiers.forEach((soldier) => {res.add(soldier)})
+        });
+    return res;
+  }
+
+  List<SoldierEntity> get _lastInCellSoldiers {
+    List<SoldierEntity> res = [];
+    cells.map((CellEntity cell) => cell.soldiers).forEach((soldiers) => {
+          if (soldiers.isNotEmpty) {res.add(soldiers.last)}
+        });
+    return res;
+  }
+
   void rotateDices() {
     _rollDice(dices[0]);
     _rollDice(dices[1]);
     duringTurn = true;
+    _calculatePossibleMoves();
   }
 
   void _rollDice(DiceEntity dice) {
@@ -189,5 +237,4 @@ class GameProvider with ChangeNotifier {
   bool get showRestartButton {
     return false;
   }
-
 }

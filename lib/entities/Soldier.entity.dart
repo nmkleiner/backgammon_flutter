@@ -8,9 +8,8 @@ class SoldierEntity {
   List<int> possibleMoves = [];
   bool isMoving = false;
   bool isSelected = false;
+  String cellId;
 
-  // bool isEaten;
-  // bool isOut;
   //  isLastInCell?,
 
   SoldierEntity({this.id, this.color});
