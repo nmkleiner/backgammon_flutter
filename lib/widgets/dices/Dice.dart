@@ -1,14 +1,15 @@
+import 'package:backgammon/entities/Dice.entity.dart';
 import 'package:flutter/material.dart';
 
 import 'Dot.dart';
 
 class Dice extends StatelessWidget {
   final Animation<double> angleAnimation;
-  final int diceNumber;
+  final DiceEntity dice;
 
-  Dice(this.angleAnimation, this.diceNumber);
+  Dice(this.angleAnimation, this.dice);
   List<bool> get _dotsVisibilityStatus {
-    switch (diceNumber) {
+    switch (dice.number) {
       case 1:
         return [false, false, false, true, false, false, false];
         break;
@@ -62,7 +63,7 @@ class Dice extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            color: Colors.white,
+            color: dice.isUsed? Colors.grey[300] : Colors.white,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -53,8 +53,8 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Dice(_angleAnimation, gameProvider.dices[0].number),
-          Dice(_angleAnimation, gameProvider.dices[1].number),
+          Dice(_angleAnimation, gameProvider.dices[0]),
+          Dice(_angleAnimation, gameProvider.dices[1]),
         ],
       ),
     );

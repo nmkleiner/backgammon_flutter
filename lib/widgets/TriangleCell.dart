@@ -9,11 +9,16 @@ class TriangleCell extends StatelessWidget {
   final String id;
   final isRotated;
   final List<SoldierEntity> soldiers;
+  final bool isPossibleMove;
 
-  TriangleCell({this.id, this.isRotated, this.soldiers});
+  TriangleCell({this.id, this.isRotated, this.soldiers, this.isPossibleMove});
 
   Color get color {
-    return int.parse(id) % 2 == 0 ? Colors.black : Colors.red;
+    if (isPossibleMove) {
+      return int.parse(id) % 2 == 0 ? Colors.greenAccent : Colors.white;
+    } else {
+      return int.parse(id) % 2 == 0 ? Colors.black : Colors.red;
+    }
   }
 
   @override
@@ -50,7 +55,8 @@ class TriangleCell extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)).toList(),
+                if (soldiers.isNotEmpty)
+                  ...soldiers.map((soldier) => Soldier(soldier)).toList(),
               ],
             ),
           ),

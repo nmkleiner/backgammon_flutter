@@ -27,7 +27,9 @@ class Cell extends StatelessWidget {
       return TriangleCell(
           id: cell.id,
           isRotated: int.parse(cell.id) > 12,
-          soldiers: cell.soldiers);
+          soldiers: cell.soldiers,
+          isPossibleMove: cell.isPossibleMove,
+          );
     }
   }
 
@@ -37,7 +39,7 @@ class Cell extends StatelessWidget {
     return GestureDetector(
       child: cellType,
       onTap: () {
-        gameProvider.onCellClick(cell.id);
+        gameProvider.onCellClick(cell);
       },
     );
   }

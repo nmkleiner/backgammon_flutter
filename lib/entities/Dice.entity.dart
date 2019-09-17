@@ -5,4 +5,9 @@ class DiceEntity {
   bool isUsed = false;
 
   DiceEntity(this.index);
+
+  useDice() {
+    number = null;
+    isUsed = true;
+  }
 }
