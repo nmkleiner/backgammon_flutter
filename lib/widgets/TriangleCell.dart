@@ -15,7 +15,7 @@ class TriangleCell extends StatelessWidget {
 
   Color get color {
     if (isPossibleMove) {
-      return int.parse(id) % 2 == 0 ? Colors.greenAccent : Colors.white;
+      return Color.fromRGBO(50, 200, 50, 1);
     } else {
       return int.parse(id) % 2 == 0 ? Colors.black : Colors.red;
     }

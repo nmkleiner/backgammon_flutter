@@ -7,7 +7,6 @@ class DiceEntity {
   DiceEntity(this.index);
 
   useDice() {
-    number = null;
     isUsed = true;
   }
 }

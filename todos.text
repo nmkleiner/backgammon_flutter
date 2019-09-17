@@ -27,6 +27,12 @@ V-calculate possible moves based on:
 -open gameService from backgammon-vue and create a list of steps to implement
 
 -cell click
+    V-  nicer colors for possibleMove cells
+    -   recalculate possible moves after move
+    -   reset possibleMove cells
+    -   don't reuse used dices. (supposed to be already implemented, verify!)
+    -   possibleMove Cells are not correct
+    -   end turn.
 -switch turns
 -eating soldiers
 -exiting board
