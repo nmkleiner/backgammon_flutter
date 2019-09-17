@@ -106,6 +106,7 @@ class GameProvider with ChangeNotifier {
     CellEntity source = selectedSoldierCell;
     source.soldiers.removeLast();
     destination.soldiers.add(selectedSoldier);
+    selectedSoldier.cellId = destination.id;
   }
 
   CellEntity _getCellById(String id) {
@@ -135,6 +136,7 @@ class GameProvider with ChangeNotifier {
               .toList();
       soldiers.forEach((soldier) {
         cells[int.parse(cellId)].soldiers.add(soldier);
+        soldier.cellId = cellId;
       });
     });
   }
@@ -150,8 +152,61 @@ class GameProvider with ChangeNotifier {
 
   void _calculatePossibleMoves() {
     List<SoldierEntity> soldiers = _possibleSoldiers;
+    print('relevantSoldiers : ');
     print(soldiers.map((soldier) => soldier.id));
     int direction = currentTurn == Colors.white ? 1 : -1;
+    List possibleMoves = [];
+    soldiers.forEach((soldier) {
+      CellEntity source = _getCellById(soldier.cellId);
+      var soldierMoves = [];
+      soldierMoves = _calculateNaiveSoldierMoves(source, direction);
+      print(soldier.cellId);
+      print(soldierMoves);
+    });
+  }
+
+  _calculateNaiveSoldierMoves(CellEntity source, int direction) {
+    var moves = [];
+    bool isGettingOut = true;
+    int srcCellIndex = _getCellIndex(source.id);
+    print('dices in calculation time');
+    print(dices[0].number);
+    print(dices[1].number);
+    if (srcCellIndex != 0 && srcCellIndex != 25) {
+      isGettingOut = false;
+    }
+    // if (!dices.doubleCount) {
+    if (dices[0].isUsed && dices[1].isUsed) {
+      moves = [];
+    } else if (!isGettingOut) {
+      moves = [
+        srcCellIndex + direction * dices[0].number,
+        srcCellIndex + direction * dices[1].number,
+        srcCellIndex + direction * (dices[0].number + dices[1].number)
+      ];
+    } else {
+      moves = [
+        srcCellIndex + direction * dices[0].number,
+        srcCellIndex + direction * dices[1].number,
+        null
+      ];
+    }
+    // } else {
+    // for (let i = 1; i <= dices.doubleCount; i++) {
+    //     moves.push(source.id + direction * dices.num1 * i)
+    // }
+    // }
+    return moves;
+  }
+
+  int _getCellIndex(String cellId) {
+    if (cellId == 'whiteMiddleCell') {
+      return 0;
+    } else if (cellId == 'blackMiddleCell') {
+      return 25;
+    } else {
+      return int.parse(cellId);
+    }
   }
 
   List<SoldierEntity> get _possibleSoldiers {
@@ -195,29 +250,39 @@ class GameProvider with ChangeNotifier {
     return res;
   }
 
-  void rotateDices() {
+  void rollDices() {
     _rollDice(dices[0]);
     _rollDice(dices[1]);
     duringTurn = true;
-    _calculatePossibleMoves();
+    dicesRolling = true;
+
+    Future.delayed(const Duration(milliseconds: 700), () {
+      dicesRolling = false;
+      _swapDices();
+      _calculatePossibleMoves();
+      notifyListeners();
+    });
+  }
+
+  void _swapDices() {
+    if (dices[0].number > dices[1].number) {
+      int swapper = dices[0].number;
+      dices[0].number = dices[1].number;
+      dices[1].number = swapper;
+    }
   }
 
   void _rollDice(DiceEntity dice) {
     int _counter = 0;
-    dicesRolling = true;
     Timer.periodic(
-        Duration(milliseconds: 60),
-        (timer) => {
-              _counter++,
-              if (_counter > 5) {timer.cancel()},
-              dice.number = math.Random().nextInt(7),
-              notifyListeners()
-            });
-    Future.delayed(const Duration(milliseconds: 700), () {
-      dicesRolling = false;
-      notifyListeners();
-    });
-    notifyListeners();
+      Duration(milliseconds: 60),
+      (timer) => {
+        _counter++,
+        if (_counter > 5) {timer.cancel()},
+        dice.number = math.Random().nextInt(7),
+        notifyListeners()
+      },
+    );
   }
 
   bool get showDicesButton {

@@ -14,7 +14,7 @@ class ActionButtons extends StatelessWidget {
     Widget buttonToShow() {
       if (gameProvider.showDicesButton) {
         return NiceButton(
-            onPressed: gameProvider.rotateDices, text: 'Roll Dices');
+            onPressed: gameProvider.rollDices, text: 'Roll Dices');
       } else {
         return null;
       }
