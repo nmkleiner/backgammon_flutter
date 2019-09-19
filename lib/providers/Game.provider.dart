@@ -87,7 +87,7 @@ class GameProvider with ChangeNotifier {
     Future.delayed(const Duration(milliseconds: 700), () {
       dicesRolling = false;
       // force doubles
-      // dices[0].number = dices[1].number;
+      dices[0].number = dices[1].number;
       // dices[0].number = 1;
       // dices[1].number = 1;
       notifyListeners();
@@ -464,7 +464,10 @@ class GameProvider with ChangeNotifier {
       int stepCount = (distance / dices[0].number).floor();
       if (distance % dices[0].number != 0) stepCount++;
       doubleCount -= stepCount;
-      if (doubleCount == 0) dices[0].useDice();
+      if (doubleCount == 0) {
+        dices[0].useDice();
+        dices[1].useDice();
+      }
     }
   }
 
@@ -483,7 +486,9 @@ class GameProvider with ChangeNotifier {
 
   bool get showDicesButton {
     return (!this.duringTurn);
+    // when game has two players
     // && this.currentTurn == this.loggedInUser['color']);
+    // when game has two players and they throw a single dice to check who starts
     // this.isGameOn &&
     // !this.rolling &&
   }
