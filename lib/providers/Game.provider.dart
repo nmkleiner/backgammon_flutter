@@ -13,12 +13,12 @@ class GameProvider with ChangeNotifier {
   Color currentTurn = Colors.black;
   // possibleMoves
   bool duringTurn = false;
-  Map loggedInUser = {
-    'name': 'noam',
-    'id': '123',
-    'pic': '.jpg',
-    'color': Colors.black
-  };
+  // Map loggedInUser = {
+  //   'name': 'noam',
+  //   'id': '123',
+  //   'pic': '.jpg',
+  //   'color': Colors.black
+  // };
   bool winner = false;
   bool isMars = false;
   bool isTurkishMars = false;
@@ -75,6 +75,7 @@ class GameProvider with ChangeNotifier {
 
   GameProvider() {
     _setBoard();
+    rollDices();
   }
 
   void rollDices() {
@@ -101,15 +102,17 @@ class GameProvider with ChangeNotifier {
     // three options:
 
     if (!thereIsSelectedSoldier &&
-        clickedCell.soldiers.isNotEmpty &&
-        currentTurn == clickedCell.soldiers.last.color &&
-        currentTurn == loggedInUser['color']) {
+            clickedCell.soldiers.isNotEmpty &&
+            currentTurn == clickedCell.soldiers.last.color
+        // && currentTurn == loggedInUser['color']
+        ) {
       // -  select soldier.
       _selectLastSoldierInCell(clickedCell);
 
       return;
     } else if (thereIsSelectedSoldier && !clickedCell.isPossibleMove) {
       // -  unSelect soldier
+      print('unselect soldier: ');
       _unselectSelectedSoldier();
     } else if (thereIsSelectedSoldier && clickedCell.isPossibleMove) {
       // -  move soldier.
@@ -117,8 +120,12 @@ class GameProvider with ChangeNotifier {
       _useDices(clickedCell);
       _unselectSelectedSoldier();
       _resetPossibleMoveCells();
-      bool hasPossibleMoves = _calculatePossibleMoves();
-      _checkIfEndTurn(hasPossibleMoves);
+
+      bool endTurn = _checkIfEndTurnByDices();
+      if (!endTurn) {
+        List<int> possibleMoves = _calculatePossibleMoves();
+        _checkIfEndTurnByPossibleMoves(possibleMoves);
+      }
     }
     notifyListeners();
   }
@@ -144,6 +151,7 @@ class GameProvider with ChangeNotifier {
     selectedSoldier.isSelected = false;
     selectedSoldier = null;
     thereIsSelectedSoldier = false;
+    _resetPossibleMoveCells();
   }
 
   void _setBoard() {
@@ -158,15 +166,26 @@ class GameProvider with ChangeNotifier {
     });
   }
 
-  void _checkIfEndTurn(bool hasPossibleMoves) {
-    if (!hasPossibleMoves) {
+  void _checkIfEndTurnByPossibleMoves(List<int> possibleMoves) {
+    print('checkIfEndTurn :  ${!_hasPossibleMoves(possibleMoves)}');
+    if (!_hasPossibleMoves(possibleMoves)) {
       _endTurn();
     }
+  }
+
+  bool _checkIfEndTurnByDices() {
+    print('_checkIfEndTurnByDices : ${dices[0].isUsed} ${dices[1].isUsed}');
+    if (dices[0].isUsed && dices[1].isUsed) {
+      _endTurn();
+      return true;
+    }
+    return false;
   }
 
   void _endTurn() {
     currentTurn = currentTurn == Colors.white ? Colors.black : Colors.white;
     duringTurn = false;
+
     // TODO: check if end game, mars, turkish mars etc.
   }
 
@@ -190,36 +209,34 @@ class GameProvider with ChangeNotifier {
     cells.forEach((cell) => cell.isPossibleMove = false);
   }
 
-  bool _calculatePossibleMoves() {
+  List<int> _calculatePossibleMoves() {
     List<SoldierEntity> soldiers = _possibleSoldiers;
     print('dices: ${dices[0].number} ${dices[1].number}');
     int direction = currentTurn == Colors.white ? 1 : -1;
-    List possibleMoves = [];
+    List<int> possibleMoves = [];
     soldiers.forEach((soldier) {
       CellEntity source = _getCellById(soldier.cellId);
       List<int> soldierMoves = [];
       soldierMoves = _calculateNaiveSoldierMoves(source, direction);
-      // print('----calculated naive soldier moves: $soldierMoves');
+      print('----calculated naive soldier moves: $soldierMoves');
       soldierMoves = _removeSrcCellMoves(soldierMoves, source);
-      // print('----removed source cell moves: $soldierMoves');
+      print('----removed source cell moves: $soldierMoves');
       soldierMoves = _removeOpponentHousesMoves(soldierMoves);
-      // print('----removed opponent house moves: $soldierMoves');
+      print('----removed opponent house moves: $soldierMoves');
       soldierMoves = _removeBasedOnHousesMoves(soldierMoves);
-      // print('----removed based on opponent house moves: $soldierMoves');
+      print('----removed based on opponent house moves: $soldierMoves');
       soldierMoves = _removeBasedOnOutsideMoves(soldierMoves);
-      // print('----removed based on outside moves: $soldierMoves');
+      print('----removed based on outside moves: $soldierMoves');
       soldierMoves = _removeExitMoves(soldierMoves);
-      // print('----removed exit moves: $soldierMoves');
+      print('----removed exit moves: $soldierMoves');
       soldierMoves = _removeNulls(soldierMoves);
-      // print('----removed null moves: $soldierMoves');
+      print('----removed null moves: $soldierMoves');
       soldier.possibleMoves = soldierMoves;
       print('             ');
       soldierMoves.forEach((soldierMove) => possibleMoves.add(soldierMove));
     });
     print('possibleMoves : $possibleMoves');
-    return _hasPossibleMoves(possibleMoves);
-
-    // TODO: return possible moves so we can decide if turn has ended
+    return possibleMoves;
   }
 
   _calculateNaiveSoldierMoves(CellEntity source, int direction) {
@@ -233,7 +250,7 @@ class GameProvider with ChangeNotifier {
     if (doubleCount == 0) {
       int num1 = dices[0].isUsed ? 0 : dices[0].number;
       int num2 = dices[1].isUsed ? 0 : dices[1].number;
-      print('num1: $num1 num2: $num2');
+      print('----_calculateNaiveSoldierMoves num1: $num1 num2: $num2');
       if (dices[0].isUsed && dices[1].isUsed) {
         moves = [];
       } else if (!isGettingOut) {
@@ -405,8 +422,8 @@ class GameProvider with ChangeNotifier {
     return middleCell.soldiers.isNotEmpty;
   }
 
-  bool _hasPossibleMoves(List possibleMoves) {
-    return !possibleMoves.any((possibleMove) => possibleMove != null);
+  bool _hasPossibleMoves(List<int> possibleMoves) {
+    return possibleMoves.any((possibleMove) => possibleMove != null);
   }
 
   List<SoldierEntity> get _allSoldiers {
@@ -461,10 +478,12 @@ class GameProvider with ChangeNotifier {
 
   void _rollDice(DiceEntity dice) {
     dice.number = math.Random().nextInt(6) + 1;
+    dice.isUsed = false;
   }
 
   bool get showDicesButton {
-    return (!this.duringTurn && this.currentTurn == this.loggedInUser['color']);
+    return (!this.duringTurn);
+    // && this.currentTurn == this.loggedInUser['color']);
     // this.isGameOn &&
     // !this.rolling &&
   }
