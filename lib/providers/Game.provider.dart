@@ -11,7 +11,6 @@ class GameProvider with ChangeNotifier {
   CellEntity selectedSoldierCell;
   bool thereIsSelectedSoldier = false;
   Color currentTurn = Colors.black;
-  // possibleMoves
   bool duringTurn = false;
   // Map loggedInUser = {
   //   'name': 'noam',
@@ -39,7 +38,7 @@ class GameProvider with ChangeNotifier {
     CellEntity(id: '4'),
     CellEntity(id: '5'),
     CellEntity(id: '6'),
-    CellEntity(id: 'blackMiddleCell', isMiddleCell: true),
+    CellEntity(id: 'whiteMiddleCell', isMiddleCell: true),
     CellEntity(id: '7'),
     CellEntity(id: '8'),
     CellEntity(id: '9'),
@@ -52,7 +51,7 @@ class GameProvider with ChangeNotifier {
     CellEntity(id: '16'),
     CellEntity(id: '17'),
     CellEntity(id: '18'),
-    CellEntity(id: 'whiteMiddleCell', isMiddleCell: true),
+    CellEntity(id: 'blackMiddleCell', isMiddleCell: true),
     CellEntity(id: '19'),
     CellEntity(id: '20'),
     CellEntity(id: '21'),
@@ -87,10 +86,9 @@ class GameProvider with ChangeNotifier {
     Future.delayed(const Duration(milliseconds: 700), () {
       dicesRolling = false;
       // force doubles
-      dices[0].number = dices[1].number;
+      // dices[0].number = dices[1].number;
       // dices[0].number = 1;
       // dices[1].number = 1;
-      notifyListeners();
       _swapDices();
       _setDoubleCount();
       _calculatePossibleMoves();
@@ -99,11 +97,10 @@ class GameProvider with ChangeNotifier {
   }
 
   void onCellClick(CellEntity clickedCell) {
-    // three options:
-
     if (!thereIsSelectedSoldier &&
             clickedCell.soldiers.isNotEmpty &&
-            currentTurn == clickedCell.soldiers.last.color
+            currentTurn == clickedCell.soldiers.last.color &&
+            clickedCell.soldiers.last.possibleMoves.isNotEmpty
         // && currentTurn == loggedInUser['color']
         ) {
       // -  select soldier.
@@ -121,6 +118,16 @@ class GameProvider with ChangeNotifier {
       _unselectSelectedSoldier();
       _resetPossibleMoveCells();
 
+      bool endGame = _checkIfEndGame();
+      if (endGame) {
+        _endGame();
+        isMars = _checkIfMars();
+        if (isMars) {
+          isTurkishMars = _checkIfTurkishMars();
+        }
+        return;
+      }
+
       bool endTurn = _checkIfEndTurnByDices();
       if (!endTurn) {
         List<int> possibleMoves = _calculatePossibleMoves();
@@ -133,8 +140,31 @@ class GameProvider with ChangeNotifier {
   void _moveSelectedSoldier(CellEntity destination) {
     CellEntity source = selectedSoldierCell;
     source.soldiers.removeLast();
+    _checkHandleEatenSoldier(destination);
     destination.soldiers.add(selectedSoldier);
     selectedSoldier.cellId = destination.id;
+  }
+
+  void _checkHandleEatenSoldier(CellEntity destination) {
+    if (destination.soldiers.isNotEmpty &&
+        destination.soldiers[0].color == _opponentColor) {
+      SoldierEntity eatenSoldier = destination.soldiers.removeAt(0);
+      _handleEatenSoldier(eatenSoldier);
+    }
+  }
+
+  void _handleEatenSoldier(SoldierEntity eatenSoldier) {
+    String middleCellId = eatenSoldier.color == Colors.white
+        ? 'whiteMiddleCell'
+        : 'blackMiddleCell';
+
+    eatenSoldier.cellId = middleCellId;
+    CellEntity middleCell = _getCellById(middleCellId);
+    middleCell.soldiers.add(eatenSoldier);
+  }
+
+  Color get _opponentColor {
+    return currentTurn == Colors.white ? Colors.black : Colors.white;
   }
 
   void _selectLastSoldierInCell(CellEntity cell) {
@@ -169,6 +199,7 @@ class GameProvider with ChangeNotifier {
   void _checkIfEndTurnByPossibleMoves(List<int> possibleMoves) {
     print('checkIfEndTurn :  ${!_hasPossibleMoves(possibleMoves)}');
     if (!_hasPossibleMoves(possibleMoves)) {
+
       _endTurn();
     }
   }
@@ -185,8 +216,6 @@ class GameProvider with ChangeNotifier {
   void _endTurn() {
     currentTurn = currentTurn == Colors.white ? Colors.black : Colors.white;
     duringTurn = false;
-
-    // TODO: check if end game, mars, turkish mars etc.
   }
 
   int soldierId = 0;
@@ -198,9 +227,32 @@ class GameProvider with ChangeNotifier {
     return soldiers;
   }
 
+  bool _checkIfEndGame() {
+    CellEntity exitCell = currentTurn == Colors.white? _getCellById('whiteExitCell') : _getCellById('blackExitCell');
+    return exitCell.soldiers.length == 15;
+  }
+
+  bool _checkIfMars() {
+    return (currentTurn == Colors.white) ?
+        (_getCellById('blackExitCell').soldiers.length == 0) :
+        (_getCellById('whiteExitCell').soldiers.length == 0);
+  }
+
+  bool _checkIfTurkishMars() {
+    int count = 0;
+    cells = (currentTurn == Colors.white) ? cells.sublist(0, 7) : cells.sublist(21, 28);
+    cells.forEach((cell) => count += cell.soldiers.length);
+    return count < 15;
+  }
+
+  void _endGame() {
+    winner = true;
+  }
+
   void _setPossibleMoveCells() {
-    selectedSoldier.possibleMoves.forEach((cellId) {
-      CellEntity cell = _getCellById(cellId.toString());
+    selectedSoldier.possibleMoves.forEach((cellIndex) {
+      String cellId = _getCellIdFromIndex(cellIndex);
+      CellEntity cell = _getCellById(cellId);
       cell.isPossibleMove = true;
     });
   }
@@ -211,6 +263,7 @@ class GameProvider with ChangeNotifier {
 
   List<int> _calculatePossibleMoves() {
     List<SoldierEntity> soldiers = _possibleSoldiers;
+    _resetPossibleMoves();
     print('dices: ${dices[0].number} ${dices[1].number}');
     int direction = currentTurn == Colors.white ? 1 : -1;
     List<int> possibleMoves = [];
@@ -239,7 +292,12 @@ class GameProvider with ChangeNotifier {
     return possibleMoves;
   }
 
-  _calculateNaiveSoldierMoves(CellEntity source, int direction) {
+  void _resetPossibleMoves() {
+    List<SoldierEntity> soldiers = _allSoldiers;
+    soldiers.forEach((soldier) => soldier.possibleMoves = []);
+  }
+
+  List<int> _calculateNaiveSoldierMoves(CellEntity source, int direction) {
     List<int> moves = [];
     bool isGettingOut = true;
     int srcCellIndex = _getCellIndexFromId(source.id);
@@ -342,61 +400,6 @@ class GameProvider with ChangeNotifier {
     return moves.where((move) => move != null).toList();
   }
 
-  bool _isOpponentHouse(int cellIndex) {
-    if (cellIndex == null) {
-      return false;
-    }
-    if (cellIndex > 24 || cellIndex < 1) {
-      return false;
-    }
-    String cellId = _getCellIdFromIndex(cellIndex);
-    CellEntity cell = _getCellById(cellId);
-    return currentTurn == Colors.white && cell.isHouseOf(Colors.black) ||
-        currentTurn == Colors.black && cell.isHouseOf(Colors.white);
-  }
-
-  bool get _canExit {
-    List _cells = currentTurn == Colors.white
-        ? cells.sublist(21, 27)
-        : cells.sublist(1, 7);
-    int count = 0;
-    _cells.forEach((cell) {
-      cell.soldiers.forEach((soldier) {
-        if (soldier.color == currentTurn) count++;
-      });
-    });
-    return count == 15;
-  }
-
-  CellEntity _getCellById(String id) {
-    return cells.firstWhere((cell) => cell.id == id);
-  }
-
-  int _getCellIndexFromId(String cellId) {
-    switch (cellId) {
-      case 'whiteExitCell':
-        return 25;
-      case 'blackExitCell':
-        return 0;
-      case 'whiteMiddleCell':
-        return 0;
-      case 'blackMiddleCell':
-        return 25;
-      default:
-        return int.parse(cellId);
-    }
-  }
-
-  String _getCellIdFromIndex(int cellIndex) {
-    if (cellIndex == 0) {
-      return 'whiteMiddleCell';
-    } else if (cellIndex == 25) {
-      return 'blackMiddleCell';
-    } else {
-      return cellIndex.toString();
-    }
-  }
-
   List<SoldierEntity> get _possibleSoldiers {
     List<SoldierEntity> soldiers = _lastInCellSoldiers;
     CellEntity middleCell = currentTurn == Colors.white
@@ -413,17 +416,6 @@ class GameProvider with ChangeNotifier {
       // get soldiers from middleCell
       return [middleCell.soldiers.last];
     }
-  }
-
-  bool get _hasEatenSoldiers {
-    CellEntity middleCell = currentTurn == Colors.white
-        ? _getCellById('whiteMiddleCell')
-        : _getCellById('blackMiddleCell');
-    return middleCell.soldiers.isNotEmpty;
-  }
-
-  bool _hasPossibleMoves(List<int> possibleMoves) {
-    return possibleMoves.any((possibleMove) => possibleMove != null);
   }
 
   List<SoldierEntity> get _allSoldiers {
@@ -484,6 +476,43 @@ class GameProvider with ChangeNotifier {
     dice.isUsed = false;
   }
 
+  bool get _hasEatenSoldiers {
+    CellEntity middleCell = currentTurn == Colors.white
+        ? _getCellById('whiteMiddleCell')
+        : _getCellById('blackMiddleCell');
+    return middleCell.soldiers.isNotEmpty;
+  }
+
+  bool _hasPossibleMoves(List<int> possibleMoves) {
+    return possibleMoves.any((possibleMove) => possibleMove != null);
+  }
+
+  bool _isOpponentHouse(int cellIndex) {
+    if (cellIndex == null) {
+      return false;
+    }
+    if (cellIndex > 24 || cellIndex < 1) {
+      return false;
+    }
+    String cellId = _getCellIdFromIndex(cellIndex);
+    CellEntity cell = _getCellById(cellId);
+    return currentTurn == Colors.white && cell.isHouseOf(Colors.black) ||
+        currentTurn == Colors.black && cell.isHouseOf(Colors.white);
+  }
+
+  bool get _canExit {
+    List _cells = currentTurn == Colors.white
+        ? cells.sublist(21, 28)
+        : cells.sublist(0, 7);
+    int count = 0;
+    _cells.forEach((cell) {
+      cell.soldiers.forEach((soldier) {
+        if (soldier.color == currentTurn) count++;
+      });
+    });
+    return count == 15;
+  }
+
   bool get showDicesButton {
     return (!this.duringTurn);
     // when game has two players
@@ -503,6 +532,36 @@ class GameProvider with ChangeNotifier {
 
   bool get showRestartButton {
     return false;
+  }
+
+  CellEntity _getCellById(String id) {
+    print('getCellById $id');
+    return cells.firstWhere((cell) => cell.id == id);
+  }
+
+  int _getCellIndexFromId(String cellId) {
+    switch (cellId) {
+      case 'whiteExitCell':
+        return 25;
+      case 'blackExitCell':
+        return 0;
+      case 'whiteMiddleCell':
+        return 0;
+      case 'blackMiddleCell':
+        return 25;
+      default:
+        return int.parse(cellId);
+    }
+  }
+
+  String _getCellIdFromIndex(int cellIndex) {
+    if (cellIndex == 0) {
+      return 'blackExitCell';
+    } else if (cellIndex == 25) {
+      return 'whiteExitCell';
+    } else {
+      return cellIndex.toString();
+    }
   }
 
   int _abs(int x) {

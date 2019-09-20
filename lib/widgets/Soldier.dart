@@ -8,7 +8,7 @@ class Soldier extends StatelessWidget {
 
   Soldier(this.soldier);
 
-  Color get _soldierColor {
+  Color get _soldierBorderColor {
     if (soldier.isSelected) {
       return Colors.yellowAccent;
     } else {
@@ -16,21 +16,29 @@ class Soldier extends StatelessWidget {
     }
   }
 
+  bool get isInExitCell {
+    return soldier.cellId == 'whiteExitCell' || soldier.cellId == 'blackExitCell' ;
+  }
+
   @override
   Widget build(BuildContext context) {
     final boardConstants = Provider.of<BoardConstants>(context);
-    return Container(
+    if (!isInExitCell) return Container(
       height: boardConstants.soldierRadius * 2,
       width: boardConstants.soldierRadius * 2,
       decoration: BoxDecoration(
         color: soldier.color,
         borderRadius: BorderRadius.circular(boardConstants.soldierRadius),
-        border: Border.all(color: _soldierColor, width: 2),
-      ),
-      child: Text(
-        soldier.id.toString(),
-        style: TextStyle(color: Colors.blueAccent, fontSize: 20),
-      ),
+        border: Border.all(color: _soldierBorderColor, width: 2),
+      )
+    );
+    if (isInExitCell) return Container(
+      width: boardConstants.soldierRadius * 2,
+      height: boardConstants.soldierRadius * 0.8,
+      decoration: BoxDecoration(
+        color: soldier.color,
+        border: Border.all(color: _soldierBorderColor, width: 1),
+      )
     );
   }
 }

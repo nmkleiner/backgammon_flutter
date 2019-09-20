@@ -26,8 +26,9 @@ class MiddleCell extends StatelessWidget {
           Container(
             width: boardConstants.middleCellWidth,
             height: boardConstants.rowHeight,
+            padding: EdgeInsets.symmetric(vertical: 5),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)).toList(),
