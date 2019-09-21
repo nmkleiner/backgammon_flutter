@@ -3,6 +3,7 @@ import 'package:backgammon/widgets/ActionButtons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Cell.dart';
+import 'Message.dart';
 import 'dices/Dices.dart';
 import 'CellGroup.dart';
 
@@ -16,6 +17,7 @@ class GameBoard extends StatelessWidget {
         Border(left: borderSide, top: borderSide, right: borderSide);
     final bottomRowBorders =
         Border(left: borderSide, bottom: borderSide, right: borderSide);
+        print('gameBoardBuild :');
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(232, 214, 162, 1),
@@ -50,7 +52,8 @@ class GameBoard extends StatelessWidget {
           ],
         ),
         Dices(),
-        ActionButtons()
+        ActionButtons(),
+        if (gameProvider.winner) Message(),
       ]),
     );
   }

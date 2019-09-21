@@ -72,6 +72,27 @@ class GameProvider with ChangeNotifier {
     '24': {'amount': 2, 'color': Colors.black},
   };
 
+  Map<String, Map<String, dynamic>> boardMapForGameEndTesting = {
+    '1': {'amount': 2, 'color': Colors.black},
+    'blackExitCell': {'amount': 13, 'color': Colors.black},
+    'whiteExitCell': {'amount': 13, 'color': Colors.white},
+    '24': {'amount': 2, 'color': Colors.white},
+  };
+
+  Map<String, Map<String, dynamic>> boardMapForMarsTesting = {
+    '1': {'amount': 2, 'color': Colors.black},
+    'blackExitCell': {'amount': 13, 'color': Colors.black},
+    '13': {'amount': 13, 'color': Colors.white},
+    '24': {'amount': 2, 'color': Colors.white},
+  };
+
+  Map<String, Map<String, dynamic>> boardMapForTurkishMarsTesting = {
+    '1': {'amount': 2, 'color': Colors.black},
+    'blackExitCell': {'amount': 13, 'color': Colors.black},
+    '3': {'amount': 13, 'color': Colors.white},
+    '8': {'amount': 2, 'color': Colors.white},
+  };
+
   GameProvider() {
     _setBoard();
     rollDices();
@@ -109,7 +130,6 @@ class GameProvider with ChangeNotifier {
       return;
     } else if (thereIsSelectedSoldier && !clickedCell.isPossibleMove) {
       // -  unSelect soldier
-      print('unselect soldier: ');
       _unselectSelectedSoldier();
     } else if (thereIsSelectedSoldier && clickedCell.isPossibleMove) {
       // -  move soldier.
@@ -122,9 +142,11 @@ class GameProvider with ChangeNotifier {
       if (endGame) {
         _endGame();
         isMars = _checkIfMars();
+
         if (isMars) {
           isTurkishMars = _checkIfTurkishMars();
         }
+        notifyListeners();
         return;
       }
 
@@ -134,6 +156,17 @@ class GameProvider with ChangeNotifier {
         _checkIfEndTurnByPossibleMoves(possibleMoves);
       }
     }
+    notifyListeners();
+  }
+
+  void restartGame() {
+    duringTurn = false;
+    winner = false;
+    isMars = false;
+    isTurkishMars = false;
+    _restartDices();
+    _resetBoard();
+    _setBoard();
     notifyListeners();
   }
 
@@ -185,9 +218,13 @@ class GameProvider with ChangeNotifier {
   }
 
   void _setBoard() {
-    boardMap.forEach((String cellIndex, Map value) {
+    var _boardMap = boardMapForGameEndTesting;
+    // var _boardMap = boardMapForMarsTesting;
+    // var _boardMap = boardMapForTurkishMarsTesting;
+    // var _boardMap = boardMap;
+    _boardMap.forEach((String cellIndex, Map value) {
       List<SoldierEntity> soldiers = _createSoldiers(
-              boardMap[cellIndex]['amount'], boardMap[cellIndex]['color'])
+              _boardMap[cellIndex]['amount'], _boardMap[cellIndex]['color'])
           .toList();
       soldiers.forEach((soldier) {
         _getCellById(cellIndex).soldiers.add(soldier);
@@ -196,16 +233,17 @@ class GameProvider with ChangeNotifier {
     });
   }
 
-  void _checkIfEndTurnByPossibleMoves(List<int> possibleMoves) {
-    print('checkIfEndTurn :  ${!_hasPossibleMoves(possibleMoves)}');
-    if (!_hasPossibleMoves(possibleMoves)) {
+  void _resetBoard() {
+    cells.forEach((cell) => cell.soldiers.clear());
+  }
 
+  void _checkIfEndTurnByPossibleMoves(List<int> possibleMoves) {
+    if (!_hasPossibleMoves(possibleMoves)) {
       _endTurn();
     }
   }
 
   bool _checkIfEndTurnByDices() {
-    print('_checkIfEndTurnByDices : ${dices[0].isUsed} ${dices[1].isUsed}');
     if (dices[0].isUsed && dices[1].isUsed) {
       _endTurn();
       return true;
@@ -228,25 +266,40 @@ class GameProvider with ChangeNotifier {
   }
 
   bool _checkIfEndGame() {
-    CellEntity exitCell = currentTurn == Colors.white? _getCellById('whiteExitCell') : _getCellById('blackExitCell');
+    CellEntity exitCell = currentTurn == Colors.white
+        ? _getCellById('whiteExitCell')
+        : _getCellById('blackExitCell');
     return exitCell.soldiers.length == 15;
   }
 
   bool _checkIfMars() {
-    return (currentTurn == Colors.white) ?
-        (_getCellById('blackExitCell').soldiers.length == 0) :
-        (_getCellById('whiteExitCell').soldiers.length == 0);
+    return (currentTurn == Colors.white)
+        ? (_getCellById('blackExitCell').soldiers.length == 0)
+        : (_getCellById('whiteExitCell').soldiers.length == 0);
   }
 
   bool _checkIfTurkishMars() {
-    int count = 0;
-    cells = (currentTurn == Colors.white) ? cells.sublist(0, 7) : cells.sublist(21, 28);
-    cells.forEach((cell) => count += cell.soldiers.length);
-    return count < 15;
+    var _cells = (currentTurn == Colors.white)
+        ? cells.sublist(21, 28)
+        : cells.sublist(0, 7);
+    return _cells.any((cell) {
+      print(cell.id);
+      print(cell.soldiers.isNotEmpty &&
+          cell.soldiers[0].color == _opponentColor);
+      return cell.soldiers.isNotEmpty &&
+          cell.soldiers[0].color == _opponentColor;
+    });
   }
 
   void _endGame() {
     winner = true;
+  }
+
+  void _restartDices() {
+    dices[0].number = 6;
+    dices[0].isUsed = false;
+    dices[1].number = 6;
+    dices[1].isUsed = false;
   }
 
   void _setPossibleMoveCells() {
@@ -264,31 +317,21 @@ class GameProvider with ChangeNotifier {
   List<int> _calculatePossibleMoves() {
     List<SoldierEntity> soldiers = _possibleSoldiers;
     _resetPossibleMoves();
-    print('dices: ${dices[0].number} ${dices[1].number}');
     int direction = currentTurn == Colors.white ? 1 : -1;
     List<int> possibleMoves = [];
     soldiers.forEach((soldier) {
       CellEntity source = _getCellById(soldier.cellId);
       List<int> soldierMoves = [];
       soldierMoves = _calculateNaiveSoldierMoves(source, direction);
-      print('----calculated naive soldier moves: $soldierMoves');
       soldierMoves = _removeSrcCellMoves(soldierMoves, source);
-      print('----removed source cell moves: $soldierMoves');
       soldierMoves = _removeOpponentHousesMoves(soldierMoves);
-      print('----removed opponent house moves: $soldierMoves');
       soldierMoves = _removeBasedOnHousesMoves(soldierMoves);
-      print('----removed based on opponent house moves: $soldierMoves');
       soldierMoves = _removeBasedOnOutsideMoves(soldierMoves);
-      print('----removed based on outside moves: $soldierMoves');
       soldierMoves = _removeExitMoves(soldierMoves);
-      print('----removed exit moves: $soldierMoves');
       soldierMoves = _removeNulls(soldierMoves);
-      print('----removed null moves: $soldierMoves');
       soldier.possibleMoves = soldierMoves;
-      print('             ');
       soldierMoves.forEach((soldierMove) => possibleMoves.add(soldierMove));
     });
-    print('possibleMoves : $possibleMoves');
     return possibleMoves;
   }
 
@@ -308,7 +351,6 @@ class GameProvider with ChangeNotifier {
     if (doubleCount == 0) {
       int num1 = dices[0].isUsed ? 0 : dices[0].number;
       int num2 = dices[1].isUsed ? 0 : dices[1].number;
-      print('----_calculateNaiveSoldierMoves num1: $num1 num2: $num2');
       if (dices[0].isUsed && dices[1].isUsed) {
         moves = [];
       } else if (!isGettingOut) {
@@ -531,11 +573,10 @@ class GameProvider with ChangeNotifier {
   }
 
   bool get showRestartButton {
-    return false;
+    return winner;
   }
 
   CellEntity _getCellById(String id) {
-    print('getCellById $id');
     return cells.firstWhere((cell) => cell.id == id);
   }
 

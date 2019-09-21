@@ -21,6 +21,7 @@ class Cell extends StatelessWidget {
     } else if (cell.isExitCell) {
       return ExitCell(
           id: cell.id,
+          isPossibleMove: cell.isPossibleMove,
           isRotated: cell.id == 'whiteExitCell',
           soldiers: cell.soldiers);
     } else {

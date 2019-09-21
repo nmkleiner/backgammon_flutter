@@ -11,6 +11,7 @@ class CellGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('cellGroup build');
     return Row(
         children: isReversed
             ? <Widget>[...cells.map((cell) => Cell(cell)).toList().reversed]

@@ -28,13 +28,13 @@ V-calculate possible moves based on:
 
 -cell click
     V-  nicer colors for possibleMove cells
-    -   recalculate possible moves after move
-    -   reset possibleMove cells
-    -   don't reuse used dices. (supposed to be already implemented, verify!)
-    -   possibleMove Cells are not correct
+    V-   recalculate possible moves after move
+    V-   reset possibleMove cells
+    V-   don't reuse used dices. (supposed to be already implemented, verify!)
+    V-   possibleMove Cells are not correct
     -   end turn.
--switch turns
--eating soldiers
--exiting board
--identify game over, winner
+V-switch turns
+V-eating soldiers
+V-exiting board
+V-identify game over, winner
 -show/hide different actionButtons

@@ -15,6 +15,9 @@ class ActionButtons extends StatelessWidget {
       if (gameProvider.showDicesButton) {
         return NiceButton(
             onPressed: gameProvider.rollDices, text: 'Roll Dices');
+      } else if (gameProvider.showRestartButton) {
+        return NiceButton(
+            onPressed: gameProvider.restartGame, text: 'New Game');
       } else {
         return null;
       }
