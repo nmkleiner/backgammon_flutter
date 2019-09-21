@@ -19,7 +19,7 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
 
   void _rollDice(DiceEntity dice) {
     _angleController.forward();
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 900), () {
       _angleController.reverse();
     });
   }
@@ -32,7 +32,7 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
       duration: Duration(milliseconds: 900),
       reverseDuration: Duration(milliseconds: 0),
     );
-    _angleAnimation = Tween<double>(begin: 0.0, end: math.pi * 6).animate(
+    _angleAnimation = Tween<double>(begin: 0.0, end: math.pi * 5).animate(
         CurvedAnimation(parent: _angleController, curve: Curves.linear));
   }
 

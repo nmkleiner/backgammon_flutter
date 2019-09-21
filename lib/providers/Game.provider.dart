@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math' as math;
-
 import 'package:backgammon/entities/Cell.entity.dart';
 import 'package:backgammon/entities/Dice.entity.dart';
 import 'package:backgammon/entities/Soldier.entity.dart';
+import 'package:backgammon/services/game.service.dart';
 import 'package:flutter/material.dart';
 
 class GameProvider with ChangeNotifier {
@@ -61,60 +61,48 @@ class GameProvider with ChangeNotifier {
     CellEntity(id: 'whiteExitCell', isExitCell: true)
   ];
 
-  Map<String, Map<String, dynamic>> boardMap = {
-    '1': {'amount': 2, 'color': Colors.white},
-    '6': {'amount': 5, 'color': Colors.black},
-    '8': {'amount': 3, 'color': Colors.black},
-    '12': {'amount': 5, 'color': Colors.white},
-    '13': {'amount': 5, 'color': Colors.black},
-    '17': {'amount': 3, 'color': Colors.white},
-    '19': {'amount': 5, 'color': Colors.white},
-    '24': {'amount': 2, 'color': Colors.black},
-  };
-
-  Map<String, Map<String, dynamic>> boardMapForGameEndTesting = {
-    '1': {'amount': 2, 'color': Colors.black},
-    'blackExitCell': {'amount': 13, 'color': Colors.black},
-    'whiteExitCell': {'amount': 13, 'color': Colors.white},
-    '24': {'amount': 2, 'color': Colors.white},
-  };
-
-  Map<String, Map<String, dynamic>> boardMapForMarsTesting = {
-    '1': {'amount': 2, 'color': Colors.black},
-    'blackExitCell': {'amount': 13, 'color': Colors.black},
-    '13': {'amount': 13, 'color': Colors.white},
-    '24': {'amount': 2, 'color': Colors.white},
-  };
-
-  Map<String, Map<String, dynamic>> boardMapForTurkishMarsTesting = {
-    '1': {'amount': 2, 'color': Colors.black},
-    'blackExitCell': {'amount': 13, 'color': Colors.black},
-    '3': {'amount': 13, 'color': Colors.white},
-    '8': {'amount': 2, 'color': Colors.white},
-  };
-
+  GameService gameService = GameService();
   GameProvider() {
     _setBoard();
-    rollDices();
+    // rollDices();
   }
 
   void rollDices() {
-    _rollDice(dices[0]);
-    _rollDice(dices[1]);
     duringTurn = true;
     dicesRolling = true;
-
-    Future.delayed(const Duration(milliseconds: 700), () {
-      dicesRolling = false;
-      // force doubles
-      // dices[0].number = dices[1].number;
-      // dices[0].number = 1;
-      // dices[1].number = 1;
-      _swapDices();
-      _setDoubleCount();
-      _calculatePossibleMoves();
-      notifyListeners();
+    dices[0].isUsed = false;
+    dices[1].isUsed = false;
+    notifyListeners();
+    _switchDicesNumbers();
+    Timer(Duration(milliseconds: 900), () {
+      _handleDicesResult();
     });
+  }
+
+  _switchDicesNumbers() {
+    int _counter = 0;
+    Timer.periodic(
+      Duration(milliseconds: 70),
+      (timer) => {
+        _counter++,
+        if (_counter > 9) {timer.cancel()},
+        dices[0].number = math.Random().nextInt(6) + 1,
+        dices[1].number = math.Random().nextInt(6) + 1,
+        notifyListeners()
+      },
+    );
+  }
+
+  _handleDicesResult() {
+    dicesRolling = false;
+    // force doubles
+    // dices[0].number = dices[1].number;
+    // dices[0].number = 1;
+    // dices[1].number = 1;
+    gameService.swapDices(dices);
+    gameService.setDoubleCount(doubleCount, dices);
+    _calculatePossibleMoves();
+    notifyListeners();
   }
 
   void onCellClick(CellEntity clickedCell) {
@@ -134,7 +122,8 @@ class GameProvider with ChangeNotifier {
     } else if (thereIsSelectedSoldier && clickedCell.isPossibleMove) {
       // -  move soldier.
       _moveSelectedSoldier(clickedCell);
-      _useDices(clickedCell);
+      gameService.useDices(
+          clickedCell, selectedSoldierCell, doubleCount, dices);
       _unselectSelectedSoldier();
       _resetPossibleMoveCells();
 
@@ -180,7 +169,8 @@ class GameProvider with ChangeNotifier {
 
   void _checkHandleEatenSoldier(CellEntity destination) {
     if (destination.soldiers.isNotEmpty &&
-        destination.soldiers[0].color == _opponentColor) {
+        destination.soldiers[0].color ==
+            gameService.opponentColor(currentTurn)) {
       SoldierEntity eatenSoldier = destination.soldiers.removeAt(0);
       _handleEatenSoldier(eatenSoldier);
     }
@@ -192,12 +182,8 @@ class GameProvider with ChangeNotifier {
         : 'blackMiddleCell';
 
     eatenSoldier.cellId = middleCellId;
-    CellEntity middleCell = _getCellById(middleCellId);
+    CellEntity middleCell = gameService.getCellById(middleCellId, cells);
     middleCell.soldiers.add(eatenSoldier);
-  }
-
-  Color get _opponentColor {
-    return currentTurn == Colors.white ? Colors.black : Colors.white;
   }
 
   void _selectLastSoldierInCell(CellEntity cell) {
@@ -218,16 +204,16 @@ class GameProvider with ChangeNotifier {
   }
 
   void _setBoard() {
-    var _boardMap = boardMapForGameEndTesting;
-    // var _boardMap = boardMapForMarsTesting;
-    // var _boardMap = boardMapForTurkishMarsTesting;
-    // var _boardMap = boardMap;
+    // var _boardMap = gameService.boardMapForGameEndTesting;
+    // var _boardMap = gameService.boardMapForMarsTesting;
+    // var _boardMap = gameService.boardMapForTurkishMarsTesting;
+    var _boardMap = gameService.boardMap;
     _boardMap.forEach((String cellIndex, Map value) {
       List<SoldierEntity> soldiers = _createSoldiers(
               _boardMap[cellIndex]['amount'], _boardMap[cellIndex]['color'])
           .toList();
       soldiers.forEach((soldier) {
-        _getCellById(cellIndex).soldiers.add(soldier);
+        gameService.getCellById(cellIndex, cells).soldiers.add(soldier);
         soldier.cellId = cellIndex;
       });
     });
@@ -238,7 +224,7 @@ class GameProvider with ChangeNotifier {
   }
 
   void _checkIfEndTurnByPossibleMoves(List<int> possibleMoves) {
-    if (!_hasPossibleMoves(possibleMoves)) {
+    if (!gameService.hasPossibleMoves(possibleMoves)) {
       _endTurn();
     }
   }
@@ -267,15 +253,16 @@ class GameProvider with ChangeNotifier {
 
   bool _checkIfEndGame() {
     CellEntity exitCell = currentTurn == Colors.white
-        ? _getCellById('whiteExitCell')
-        : _getCellById('blackExitCell');
+        ? gameService.getCellById('whiteExitCell', cells)
+        : gameService.getCellById('blackExitCell', cells);
     return exitCell.soldiers.length == 15;
   }
 
   bool _checkIfMars() {
     return (currentTurn == Colors.white)
-        ? (_getCellById('blackExitCell').soldiers.length == 0)
-        : (_getCellById('whiteExitCell').soldiers.length == 0);
+        ? (gameService.getCellById('blackExitCell', cells).soldiers.length == 0)
+        : (gameService.getCellById('whiteExitCell', cells).soldiers.length ==
+            0);
   }
 
   bool _checkIfTurkishMars() {
@@ -283,11 +270,8 @@ class GameProvider with ChangeNotifier {
         ? cells.sublist(21, 28)
         : cells.sublist(0, 7);
     return _cells.any((cell) {
-      print(cell.id);
-      print(cell.soldiers.isNotEmpty &&
-          cell.soldiers[0].color == _opponentColor);
       return cell.soldiers.isNotEmpty &&
-          cell.soldiers[0].color == _opponentColor;
+          cell.soldiers[0].color == gameService.opponentColor(currentTurn);
     });
   }
 
@@ -304,8 +288,8 @@ class GameProvider with ChangeNotifier {
 
   void _setPossibleMoveCells() {
     selectedSoldier.possibleMoves.forEach((cellIndex) {
-      String cellId = _getCellIdFromIndex(cellIndex);
-      CellEntity cell = _getCellById(cellId);
+      String cellId = gameService.getCellIdFromIndex(cellIndex);
+      CellEntity cell = gameService.getCellById(cellId, cells);
       cell.isPossibleMove = true;
     });
   }
@@ -320,7 +304,7 @@ class GameProvider with ChangeNotifier {
     int direction = currentTurn == Colors.white ? 1 : -1;
     List<int> possibleMoves = [];
     soldiers.forEach((soldier) {
-      CellEntity source = _getCellById(soldier.cellId);
+      CellEntity source = gameService.getCellById(soldier.cellId, cells);
       List<int> soldierMoves = [];
       soldierMoves = _calculateNaiveSoldierMoves(source, direction);
       soldierMoves = _removeSrcCellMoves(soldierMoves, source);
@@ -343,7 +327,7 @@ class GameProvider with ChangeNotifier {
   List<int> _calculateNaiveSoldierMoves(CellEntity source, int direction) {
     List<int> moves = [];
     bool isGettingOut = true;
-    int srcCellIndex = _getCellIndexFromId(source.id);
+    int srcCellIndex = gameService.getCellIndexFromId(source.id);
 
     if (srcCellIndex != 0 && srcCellIndex != 25) {
       isGettingOut = false;
@@ -376,13 +360,16 @@ class GameProvider with ChangeNotifier {
   }
 
   List<int> _removeSrcCellMoves(List<int> moves, CellEntity source) {
-    int srcCellIndex = _getCellIndexFromId(source.id);
+    int srcCellIndex = gameService.getCellIndexFromId(source.id);
     return moves.map((move) => (move == srcCellIndex) ? null : move).toList();
   }
 
   List<int> _removeOpponentHousesMoves(List<int> moves) {
     return moves
-        .map((cellIndex) => _isOpponentHouse(cellIndex) ? null : cellIndex)
+        .map((cellIndex) =>
+            gameService.isOpponentHouse(cellIndex, cells, currentTurn)
+                ? null
+                : cellIndex)
         .toList();
   }
 
@@ -428,7 +415,7 @@ class GameProvider with ChangeNotifier {
   }
 
   List<int> _removeExitMoves(List<int> moves) {
-    if (_canExit) {
+    if (gameService.canExit(currentTurn, cells)) {
       return moves;
     } else {
       return moves
@@ -445,11 +432,11 @@ class GameProvider with ChangeNotifier {
   List<SoldierEntity> get _possibleSoldiers {
     List<SoldierEntity> soldiers = _lastInCellSoldiers;
     CellEntity middleCell = currentTurn == Colors.white
-        ? _getCellById('whiteMiddleCell')
-        : _getCellById('blackMiddleCell');
+        ? gameService.getCellById('whiteMiddleCell', cells)
+        : gameService.getCellById('blackMiddleCell', cells);
     String exitCellId =
         currentTurn == Colors.white ? 'whiteExitCell' : 'blackExitCell';
-    if (!_hasEatenSoldiers) {
+    if (!gameService.hasEatenSoldiers(currentTurn, cells)) {
       //  get soldiers that it's their turn and are not outside board
       return soldiers.where((soldier) {
         return (soldier.color == currentTurn) && (soldier.cellId != exitCellId);
@@ -476,85 +463,6 @@ class GameProvider with ChangeNotifier {
     return res;
   }
 
-  void _setDoubleCount() {
-    doubleCount = dices[0].number == dices[1].number ? 4 : 0;
-  }
-
-  void _useDices(CellEntity destination) {
-    CellEntity source = selectedSoldierCell;
-    int sourceIndex = _getCellIndexFromId(source.id);
-    int destinationIndex = _getCellIndexFromId(destination.id);
-    int distance = _abs(sourceIndex - destinationIndex);
-    if (doubleCount == 0) {
-      if (distance <= dices[0].number) {
-        dices[0].useDice();
-      } else if (distance <= dices[1].number) {
-        dices[1].useDice();
-      } else {
-        dices[0].useDice();
-        dices[1].useDice();
-      }
-    } else {
-      int stepCount = (distance / dices[0].number).floor();
-      if (distance % dices[0].number != 0) stepCount++;
-      doubleCount -= stepCount;
-      if (doubleCount == 0) {
-        dices[0].useDice();
-        dices[1].useDice();
-      }
-    }
-  }
-
-  void _swapDices() {
-    if (dices[0].number > dices[1].number) {
-      int swapper = dices[0].number;
-      dices[0].number = dices[1].number;
-      dices[1].number = swapper;
-    }
-  }
-
-  void _rollDice(DiceEntity dice) {
-    dice.number = math.Random().nextInt(6) + 1;
-    dice.isUsed = false;
-  }
-
-  bool get _hasEatenSoldiers {
-    CellEntity middleCell = currentTurn == Colors.white
-        ? _getCellById('whiteMiddleCell')
-        : _getCellById('blackMiddleCell');
-    return middleCell.soldiers.isNotEmpty;
-  }
-
-  bool _hasPossibleMoves(List<int> possibleMoves) {
-    return possibleMoves.any((possibleMove) => possibleMove != null);
-  }
-
-  bool _isOpponentHouse(int cellIndex) {
-    if (cellIndex == null) {
-      return false;
-    }
-    if (cellIndex > 24 || cellIndex < 1) {
-      return false;
-    }
-    String cellId = _getCellIdFromIndex(cellIndex);
-    CellEntity cell = _getCellById(cellId);
-    return currentTurn == Colors.white && cell.isHouseOf(Colors.black) ||
-        currentTurn == Colors.black && cell.isHouseOf(Colors.white);
-  }
-
-  bool get _canExit {
-    List _cells = currentTurn == Colors.white
-        ? cells.sublist(21, 28)
-        : cells.sublist(0, 7);
-    int count = 0;
-    _cells.forEach((cell) {
-      cell.soldiers.forEach((soldier) {
-        if (soldier.color == currentTurn) count++;
-      });
-    });
-    return count == 15;
-  }
-
   bool get showDicesButton {
     return (!this.duringTurn);
     // when game has two players
@@ -562,50 +470,5 @@ class GameProvider with ChangeNotifier {
     // when game has two players and they throw a single dice to check who starts
     // this.isGameOn &&
     // !this.rolling &&
-  }
-
-  bool get showDiceButton {
-    return false;
-  }
-
-  bool get showWaitButton {
-    return false;
-  }
-
-  bool get showRestartButton {
-    return winner;
-  }
-
-  CellEntity _getCellById(String id) {
-    return cells.firstWhere((cell) => cell.id == id);
-  }
-
-  int _getCellIndexFromId(String cellId) {
-    switch (cellId) {
-      case 'whiteExitCell':
-        return 25;
-      case 'blackExitCell':
-        return 0;
-      case 'whiteMiddleCell':
-        return 0;
-      case 'blackMiddleCell':
-        return 25;
-      default:
-        return int.parse(cellId);
-    }
-  }
-
-  String _getCellIdFromIndex(int cellIndex) {
-    if (cellIndex == 0) {
-      return 'blackExitCell';
-    } else if (cellIndex == 25) {
-      return 'whiteExitCell';
-    } else {
-      return cellIndex.toString();
-    }
-  }
-
-  int _abs(int x) {
-    return x < 0 ? -x : x;
   }
 }

@@ -17,7 +17,6 @@ class GameBoard extends StatelessWidget {
         Border(left: borderSide, top: borderSide, right: borderSide);
     final bottomRowBorders =
         Border(left: borderSide, bottom: borderSide, right: borderSide);
-        print('gameBoardBuild :');
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(232, 214, 162, 1),

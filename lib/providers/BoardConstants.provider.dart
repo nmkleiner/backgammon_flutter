@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class BoardConstants with ChangeNotifier {
   final BuildContext context;
 
-
   Size screenSize;
   double width;
   double height;
@@ -16,12 +15,17 @@ class BoardConstants with ChangeNotifier {
   double actionButtonLeft;
   double actionButtonTop;
   double soldierRadius;
-  
 
   BoardConstants(this.context) {
     screenSize = MediaQuery.of(context).size;
-    width = screenSize.width - 20; // minus border
-    height = screenSize.height - 19; // minus border
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      width = screenSize.height - 20;
+      height = screenSize.width - 20;
+    } else {
+      width = screenSize.width - 20; // minus border
+      height = screenSize.height - 19; // minus border
+    }
+
     rowHeight = (height - 25) / 2;
     cellWidth = width / 14;
     cellHeight = height / 2.5;
