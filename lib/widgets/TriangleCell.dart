@@ -38,10 +38,6 @@ class TriangleCell extends StatelessWidget {
                     width: boardConstants.cellWidth,
                     height: boardConstants.cellHeight,
                     color: color,
-                    child: Text(
-                      id,
-                      style: TextStyle(fontSize: 26, color: Colors.yellow),
-                    ),
                   ),
                 ),
                 SizedBox(
