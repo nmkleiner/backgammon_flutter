@@ -45,8 +45,8 @@ class GameService {
     return possibleMoves.any((possibleMove) => possibleMove != null);
   }
 
-  bool isOpponentHouse(
-      int cellIndex, List<CellEntity> cells, Color currentTurn) {
+  bool isOpponentHouse(int cellIndex, List<CellEntity> cells,
+      Color currentTurn) {
     if (cellIndex == null) {
       return false;
     }
@@ -116,44 +116,4 @@ class GameService {
   int abs(int x) {
     return x < 0 ? -x : x;
   }
-
-  void setDoubleCount(int doubleCount, List<DiceEntity> dices) {
-    doubleCount = dices[0].number == dices[1].number ? 4 : 0;
-  }
-
-  void useDices(CellEntity destination, CellEntity selectedSoldierCell,
-      int doubleCount, List<DiceEntity> dices) {
-    CellEntity source = selectedSoldierCell;
-    int sourceIndex = getCellIndexFromId(source.id);
-    int destinationIndex = getCellIndexFromId(destination.id);
-    int distance = abs(sourceIndex - destinationIndex);
-    if (doubleCount == 0) {
-      if (distance <= dices[0].number) {
-        dices[0].useDice();
-      } else if (distance <= dices[1].number) {
-        dices[1].useDice();
-      } else {
-        dices[0].useDice();
-        dices[1].useDice();
-      }
-    } else {
-      int stepCount = (distance / dices[0].number).floor();
-      if (distance % dices[0].number != 0) stepCount++;
-      doubleCount -= stepCount;
-      if (doubleCount == 0) {
-        dices[0].useDice();
-        dices[1].useDice();
-      }
-    }
-  }
-
-  void swapDices(List<DiceEntity> dices) {
-    if (dices[0].number > dices[1].number) {
-      int swapper = dices[0].number;
-      dices[0].number = dices[1].number;
-      dices[1].number = swapper;
-    }
-  }
-
-  
 }

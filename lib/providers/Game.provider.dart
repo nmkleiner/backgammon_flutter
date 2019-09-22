@@ -12,6 +12,7 @@ class GameProvider with ChangeNotifier {
   bool thereIsSelectedSoldier = false;
   Color currentTurn = Colors.black;
   bool duringTurn = false;
+
   // Map loggedInUser = {
   //   'name': 'noam',
   //   'id': '123',
@@ -21,6 +22,7 @@ class GameProvider with ChangeNotifier {
   bool winner = false;
   bool isMars = false;
   bool isTurkishMars = false;
+
   // score
   // bool noPossibleMoves
   bool dicesRolling = false;
@@ -62,6 +64,7 @@ class GameProvider with ChangeNotifier {
   ];
 
   GameService gameService = GameService();
+
   GameProvider() {
     _setBoard();
     // rollDices();
@@ -74,22 +77,25 @@ class GameProvider with ChangeNotifier {
     dices[1].isUsed = false;
     notifyListeners();
     _switchDicesNumbers();
-    Timer(Duration(milliseconds: 900), () {
-      _handleDicesResult();
-    });
   }
 
   _switchDicesNumbers() {
     int _counter = 0;
     Timer.periodic(
-      Duration(milliseconds: 70),
-      (timer) => {
+        Duration(milliseconds: 70),
+            (timer) => {
         _counter++,
-        if (_counter > 9) {timer.cancel()},
-        dices[0].number = math.Random().nextInt(6) + 1,
-        dices[1].number = math.Random().nextInt(6) + 1,
-        notifyListeners()
-      },
+        if (_counter >= 9) {
+          timer.cancel(),
+          Timer(Duration(milliseconds: 100), () {
+            _handleDicesResult();
+          }),
+    },
+    dices[0].number = math.Random().nextInt(6) + 1,
+    dices[1].number = math.Random().nextInt(6) + 1,
+    print('dices rolling: ${dices[0].number} ${dices[1].number} $_counter'),
+    notifyListeners()
+    },
     );
   }
 
@@ -99,19 +105,19 @@ class GameProvider with ChangeNotifier {
     // dices[0].number = dices[1].number;
     // dices[0].number = 1;
     // dices[1].number = 1;
-    gameService.swapDices(dices);
-    gameService.setDoubleCount(doubleCount, dices);
+    _swapDices();
+    _setDoubleCount();
     _calculatePossibleMoves();
     notifyListeners();
   }
 
   void onCellClick(CellEntity clickedCell) {
     if (!thereIsSelectedSoldier &&
-            clickedCell.soldiers.isNotEmpty &&
-            currentTurn == clickedCell.soldiers.last.color &&
-            clickedCell.soldiers.last.possibleMoves.isNotEmpty
-        // && currentTurn == loggedInUser['color']
-        ) {
+        clickedCell.soldiers.isNotEmpty &&
+        currentTurn == clickedCell.soldiers.last.color &&
+        clickedCell.soldiers.last.possibleMoves.isNotEmpty
+    // && currentTurn == loggedInUser['color']
+    ) {
       // -  select soldier.
       _selectLastSoldierInCell(clickedCell);
 
@@ -122,8 +128,7 @@ class GameProvider with ChangeNotifier {
     } else if (thereIsSelectedSoldier && clickedCell.isPossibleMove) {
       // -  move soldier.
       _moveSelectedSoldier(clickedCell);
-      gameService.useDices(
-          clickedCell, selectedSoldierCell, doubleCount, dices);
+      _useDices(clickedCell);
       _unselectSelectedSoldier();
       _resetPossibleMoveCells();
 
@@ -210,10 +215,13 @@ class GameProvider with ChangeNotifier {
     var _boardMap = gameService.boardMap;
     _boardMap.forEach((String cellIndex, Map value) {
       List<SoldierEntity> soldiers = _createSoldiers(
-              _boardMap[cellIndex]['amount'], _boardMap[cellIndex]['color'])
+          _boardMap[cellIndex]['amount'], _boardMap[cellIndex]['color'])
           .toList();
       soldiers.forEach((soldier) {
-        gameService.getCellById(cellIndex, cells).soldiers.add(soldier);
+        gameService
+            .getCellById(cellIndex, cells)
+            .soldiers
+            .add(soldier);
         soldier.cellId = cellIndex;
       });
     });
@@ -243,6 +251,7 @@ class GameProvider with ChangeNotifier {
   }
 
   int soldierId = 0;
+
   List<SoldierEntity> _createSoldiers(int amount, Color color) {
     List<SoldierEntity> soldiers = [];
     for (var i = 0; i < amount; i++) {
@@ -260,9 +269,15 @@ class GameProvider with ChangeNotifier {
 
   bool _checkIfMars() {
     return (currentTurn == Colors.white)
-        ? (gameService.getCellById('blackExitCell', cells).soldiers.length == 0)
-        : (gameService.getCellById('whiteExitCell', cells).soldiers.length ==
-            0);
+        ? (gameService
+        .getCellById('blackExitCell', cells)
+        .soldiers
+        .length == 0)
+        : (gameService
+        .getCellById('whiteExitCell', cells)
+        .soldiers
+        .length ==
+        0);
   }
 
   bool _checkIfTurkishMars() {
@@ -367,9 +382,9 @@ class GameProvider with ChangeNotifier {
   List<int> _removeOpponentHousesMoves(List<int> moves) {
     return moves
         .map((cellIndex) =>
-            gameService.isOpponentHouse(cellIndex, cells, currentTurn)
-                ? null
-                : cellIndex)
+    gameService.isOpponentHouse(cellIndex, cells, currentTurn)
+        ? null
+        : cellIndex)
         .toList();
   }
 
@@ -435,7 +450,7 @@ class GameProvider with ChangeNotifier {
         ? gameService.getCellById('whiteMiddleCell', cells)
         : gameService.getCellById('blackMiddleCell', cells);
     String exitCellId =
-        currentTurn == Colors.white ? 'whiteExitCell' : 'blackExitCell';
+    currentTurn == Colors.white ? 'whiteExitCell' : 'blackExitCell';
     if (!gameService.hasEatenSoldiers(currentTurn, cells)) {
       //  get soldiers that it's their turn and are not outside board
       return soldiers.where((soldier) {
@@ -449,18 +464,26 @@ class GameProvider with ChangeNotifier {
 
   List<SoldierEntity> get _allSoldiers {
     List<SoldierEntity> res = [];
-    cells.map((CellEntity cell) => cell.soldiers).forEach((soldiers) => {
-          soldiers.forEach((soldier) => {res.add(soldier)})
-        });
+    cells.map((CellEntity cell) => cell.soldiers).forEach((soldiers) =>
+    {
+    soldiers.forEach((soldier) =>
+    {
+    res.add(soldier)
+    })
+    });
     return res;
   }
 
   List<SoldierEntity> get _lastInCellSoldiers {
     List<SoldierEntity> res = [];
     cells.map((CellEntity cell) => cell.soldiers).forEach((soldiers) => {
-          if (soldiers.isNotEmpty) {res.add(soldiers.last)}
-        });
-    return res;
+        if (soldiers.isNotEmpty)
+    {
+      res.add(soldiers.last)
+    }
+  });
+    return
+    res;
   }
 
   bool get showDicesButton {
@@ -470,5 +493,50 @@ class GameProvider with ChangeNotifier {
     // when game has two players and they throw a single dice to check who starts
     // this.isGameOn &&
     // !this.rolling &&
+  }
+
+  void _useDices(CellEntity destination) {
+    CellEntity source = selectedSoldierCell;
+    int sourceIndex = gameService.getCellIndexFromId(source.id);
+    int destinationIndex = gameService.getCellIndexFromId(destination.id);
+    int distance = gameService.abs(sourceIndex - destinationIndex);
+    if (doubleCount == 0) {
+      if (distance <= dices[0].number) {
+        dices[0].useDice();
+      } else if (distance <= dices[1].number) {
+        dices[1].useDice();
+      } else {
+        dices[0].useDice();
+        dices[1].useDice();
+      }
+    } else {
+      int stepCount = (distance / dices[0].number).floor();
+      print('stepCount: $stepCount');
+      if (distance % dices[0].number != 0) {
+        stepCount++;
+      }
+      print('stepCount: $stepCount');
+      print('doubleCount: $doubleCount');
+      doubleCount = doubleCount - stepCount;
+      notifyListeners();
+      print('doubleCount: $doubleCount');
+      if (doubleCount == 0) {
+          dices[0].useDice();
+          dices[1].useDice();
+        }
+      }
+    }
+
+  void _setDoubleCount() {
+    print('setDoubleCount');
+    doubleCount = dices[0].number == dices[1].number ? 4 : 0;
+  }
+
+  void _swapDices() {
+    if (dices[0].number > dices[1].number) {
+      int swapper = dices[0].number;
+      dices[0].number = dices[1].number;
+      dices[1].number = swapper;
+    }
   }
 }
