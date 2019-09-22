@@ -63,7 +63,8 @@ class Dice extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            color: dice.isUsed? Colors.grey[300] : Colors.white,
+            color: dice.isUsed ? Colors.grey[300] : Colors.white,
+            border: Border.all(color: Colors.black, width: 1),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

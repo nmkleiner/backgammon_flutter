@@ -21,7 +21,7 @@ class MiddleCell extends StatelessWidget {
           Container(
             height: boardConstants.rowHeight,
             width: boardConstants.middleCellWidth,
-            color: Color.fromRGBO(160, 110, 44, 1),
+            color: Color.fromRGBO(100, 46, 5, 1),
           ),
           Container(
             width: boardConstants.middleCellWidth,

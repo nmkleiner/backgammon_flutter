@@ -1,3 +1,4 @@
+import 'package:backgammon/providers/BoardConstants.provider.dart';
 import 'package:backgammon/providers/Game.provider.dart';
 import 'package:backgammon/widgets/ActionButtons.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,9 @@ class GameBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context);
+    final boardConstants = Provider.of<BoardConstants>(context, listen: false);
     final borderSide =
-        BorderSide(color: Color.fromRGBO(160, 110, 44, 1), width: 10);
+        BorderSide(color: Color.fromRGBO(100, 46, 5, 1), width: boardConstants.borderWidth);
     final topRowBorders =
         Border(left: borderSide, top: borderSide, right: borderSide);
     final bottomRowBorders =

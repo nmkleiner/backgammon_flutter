@@ -32,7 +32,7 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
       duration: Duration(milliseconds: 900),
       reverseDuration: Duration(milliseconds: 0),
     );
-    _angleAnimation = Tween<double>(begin: 0.0, end: math.pi * 5).animate(
+    _angleAnimation = Tween<double>(begin: 0.0, end: math.pi * 6).animate(
         CurvedAnimation(parent: _angleController, curve: Curves.linear));
   }
 
