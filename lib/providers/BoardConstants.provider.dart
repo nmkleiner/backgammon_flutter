@@ -19,10 +19,10 @@ class BoardConstants with ChangeNotifier {
   BoardConstants(this.context) {
     screenSize = MediaQuery.of(context).size;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      width = screenSize.height - 20;
-      height = screenSize.width - 20;
+      width = screenSize.height - 21;
+      height = screenSize.width - 19;
     } else {
-      width = screenSize.width - 20; // minus border
+      width = screenSize.width - 21; // minus border
       height = screenSize.height - 19; // minus border
     }
 
