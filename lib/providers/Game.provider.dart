@@ -93,7 +93,6 @@ class GameProvider with ChangeNotifier {
     },
     dices[0].number = math.Random().nextInt(6) + 1,
     dices[1].number = math.Random().nextInt(6) + 1,
-    print('dices rolling: ${dices[0].number} ${dices[1].number} $_counter'),
     notifyListeners()
     },
     );
@@ -511,15 +510,11 @@ class GameProvider with ChangeNotifier {
       }
     } else {
       int stepCount = (distance / dices[0].number).floor();
-      print('stepCount: $stepCount');
       if (distance % dices[0].number != 0) {
         stepCount++;
       }
-      print('stepCount: $stepCount');
-      print('doubleCount: $doubleCount');
       doubleCount = doubleCount - stepCount;
       notifyListeners();
-      print('doubleCount: $doubleCount');
       if (doubleCount == 0) {
           dices[0].useDice();
           dices[1].useDice();
@@ -528,7 +523,6 @@ class GameProvider with ChangeNotifier {
     }
 
   void _setDoubleCount() {
-    print('setDoubleCount');
     doubleCount = dices[0].number == dices[1].number ? 4 : 0;
   }
 

@@ -31,7 +31,7 @@ class MiddleCell extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)).toList(),
+                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier, isRotated)).toList(),
               ],
             ),
           )

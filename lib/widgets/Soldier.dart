@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 class Soldier extends StatelessWidget {
   final SoldierEntity soldier;
+  final bool isRotated;
 
-  Soldier(this.soldier);
+  Soldier(this.soldier, this.isRotated);
 
   Color get _soldierBorderColor {
     if (soldier.isSelected) {
@@ -38,6 +39,12 @@ class Soldier extends StatelessWidget {
         color: soldier.color,
         borderRadius: BorderRadius.circular(boardConstants.soldierRadius),
         border: Border.all(color: _soldierBorderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black,
+            offset: isRotated? Offset(-3,-1) : Offset(3,1),
+          )
+        ],
       )
     );
   }

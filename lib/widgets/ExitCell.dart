@@ -38,7 +38,7 @@ class ExitCell extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 if (soldiers.isNotEmpty)
-                  ...soldiers.map((soldier) => Soldier(soldier)).toList(),
+                  ...soldiers.map((soldier) => Soldier(soldier, isRotated)).toList(),
               ],
             ),
           )

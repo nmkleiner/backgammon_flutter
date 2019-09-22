@@ -57,7 +57,7 @@ class TriangleCell extends StatelessWidget {
               textDirection: TextDirection.rtl,
               children: <Widget>[
                 if (soldiers.isNotEmpty)
-                  ...soldiers.map((soldier) => Soldier(soldier)).toList(),
+                  ...soldiers.map((soldier) => Soldier(soldier,isRotated)).toList(),
               ],
             ),
           ),
