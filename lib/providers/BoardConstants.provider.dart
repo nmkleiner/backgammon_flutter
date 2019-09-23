@@ -27,15 +27,15 @@ class BoardConstants with ChangeNotifier {
       height = screenSize.height; // minus border
     }
 
-    rowHeight = height / 2.31;
+    rowHeight = height / 2.16;
     cellHeight = rowHeight * 0.8;
     actionButtonTop = rowHeight - 13;
     soldierRadius = cellHeight / 10;
 
     borderWidth = soldierRadius;
     middleCellWidth = soldierRadius * 2;
-    cellWidth = (width - 2 * borderWidth) / 13.5;
-    exitCellWidth = (width - 2 * borderWidth) / 16;
+    cellWidth = (width - 4 * borderWidth) / 13;
+    exitCellWidth = (width - 4 * borderWidth) / 13;
     rowWidth = (width - middleCellWidth - exitCellWidth - 2 * borderWidth) / 2;
     actionButtonLeft = rowWidth * 1.4 + middleCellWidth - 5;
   }

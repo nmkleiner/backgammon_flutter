@@ -13,12 +13,12 @@ class GameService {
     '24': {'amount': 2, 'color': Colors.black},
   };
 
-  // Map<String, Map<String, dynamic>> boardMapForGameEndTesting = {
-  //   '1': {'amount': 2, 'color': Colors.black},
-  //   'blackExitCell': {'amount': 13, 'color': Colors.black},
-  //   'whiteExitCell': {'amount': 13, 'color': Colors.white},
-  //   '24': {'amount': 2, 'color': Colors.white},
-  // };
+//   Map<String, Map<String, dynamic>> boardMapForGameEndTesting = {
+//     '1': {'amount': 2, 'color': Colors.black},
+//     'blackExitCell': {'amount': 13, 'color': Colors.black},
+//     'whiteExitCell': {'amount': 13, 'color': Colors.white},
+//     '24': {'amount': 2, 'color': Colors.white},
+//   };
   // Map<String, Map<String, dynamic>> boardMapForMarsTesting = {
   //   '1': {'amount': 2, 'color': Colors.black},
   //   'blackExitCell': {'amount': 13, 'color': Colors.black},
