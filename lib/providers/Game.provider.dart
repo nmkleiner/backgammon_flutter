@@ -5,6 +5,8 @@ import 'package:backgammon/entities/Dice.entity.dart';
 import 'package:backgammon/entities/Soldier.entity.dart';
 import 'package:backgammon/services/game.service.dart';
 import 'package:flutter/material.dart';
+//import '../services/AudioPlayer.dart'
+
 
 class GameProvider with ChangeNotifier {
   SoldierEntity selectedSoldier;
@@ -12,6 +14,8 @@ class GameProvider with ChangeNotifier {
   bool thereIsSelectedSoldier = false;
   Color currentTurn = Colors.black;
   bool duringTurn = false;
+//  AudioPlayer player = AudioPlayer();
+
 
   // Map loggedInUser = {
   //   'name': 'noam',
@@ -72,9 +76,10 @@ class GameProvider with ChangeNotifier {
 
   void rollDices() {
     duringTurn = true;
-    dicesRolling = true;
+//    player.play('dice.mp3');
     dices[0].isUsed = false;
     dices[1].isUsed = false;
+    dicesRolling = true;
     notifyListeners();
     _switchDicesNumbers();
   }
