@@ -17,23 +17,31 @@ class Cell extends StatefulWidget {
 }
 
 class _CellState extends State<Cell> with TickerProviderStateMixin {
-  List<AnimationController> _soldierControllers;
-  List<Animation<Offset>> _soldierAnimations;
+  // List<AnimationController> _soldierControllers;
+  // List<Animation<Offset>> _soldierAnimation;
+  AnimationController _soldierController;
+  Animation<Offset> _soldierAnimation;
 
   @override
   void initState() {
     super.initState();
-    _soldierControllers = widget.cell.soldiers.map((_) =>
-        AnimationController(vsync: this, duration: Duration(seconds: 1)));
+    // _soldierControllers = widget.cell.soldiers.map((_) =>
+    //     AnimationController(vsync: this, duration: Duration(seconds: 1)));
 
-    _soldierAnimations = _soldierControllers.map((_soldierController) => Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 10))
-        .animate(_soldierController));
+
+    // _soldierAnimations = _soldierControllers.map((_soldierController) => Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 10))
+    //     .animate(_soldierController));
+    _soldierController = AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _soldierAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 0.5))
+        .animate(_soldierController);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _soldierControllers.forEach((_soldierController) => _soldierController.dispose());
+    _soldierController.dispose();
+    // _soldierControllers
+    //     .forEach((_soldierController) => _soldierController.dispose());
   }
 
   Widget get cellType {
@@ -41,8 +49,8 @@ class _CellState extends State<Cell> with TickerProviderStateMixin {
       return MiddleCell(
         id: widget.cell.id,
         isRotated: widget.cell.id == 'whiteMiddleCell',
-        soldierAnimations: _soldierAnimations,
         soldiers: widget.cell.soldiers,
+        soldierAnimation: _soldierAnimation,
       );
     } else if (widget.cell.isExitCell) {
       return ExitCell(
@@ -50,7 +58,7 @@ class _CellState extends State<Cell> with TickerProviderStateMixin {
         isPossibleMove: widget.cell.isPossibleMove,
         isRotated: widget.cell.id == 'whiteExitCell',
         soldiers: widget.cell.soldiers,
-        soldierAnimations: _soldierAnimations,
+        soldierAnimation: _soldierAnimation,
       );
     } else {
       return TriangleCell(
@@ -58,7 +66,7 @@ class _CellState extends State<Cell> with TickerProviderStateMixin {
         isRotated: int.parse(widget.cell.id) > 12,
         soldiers: widget.cell.soldiers,
         isPossibleMove: widget.cell.isPossibleMove,
-        soldierAnimations: _soldierAnimations,
+        soldierAnimation: _soldierAnimation,
       );
     }
   }
@@ -69,7 +77,7 @@ class _CellState extends State<Cell> with TickerProviderStateMixin {
     return GestureDetector(
       child: cellType,
       onTap: () {
-        gameProvider.onCellClick(widget.cell, _soldierControllers.last);
+        gameProvider.onCellClick(widget.cell, _soldierController);
       },
     );
   }

@@ -10,14 +10,14 @@ class TriangleCell extends StatelessWidget {
   final isRotated;
   final List<SoldierEntity> soldiers;
   final bool isPossibleMove;
-  final List<Animation> soldierAnimations;
+  final Animation soldierAnimation;
 
   TriangleCell(
       {this.id,
       this.isRotated,
       this.soldiers,
       this.isPossibleMove,
-      this.soldierAnimations});
+      this.soldierAnimation});
 
   Color get color {
     if (isPossibleMove) {
