@@ -7,30 +7,59 @@ import 'ExitCell.dart';
 import 'MiddleCell.dart';
 import 'TriangleCell.dart';
 
-class Cell extends StatelessWidget {
+class Cell extends StatefulWidget {
   final CellEntity cell;
 
   Cell(this.cell);
 
+  @override
+  _CellState createState() => _CellState();
+}
+
+class _CellState extends State<Cell> with TickerProviderStateMixin {
+  List<AnimationController> _soldierControllers;
+  List<Animation<Offset>> _soldierAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+    _soldierControllers = widget.cell.soldiers.map((_) =>
+        AnimationController(vsync: this, duration: Duration(seconds: 1)));
+
+    _soldierAnimations = _soldierControllers.map((_soldierController) => Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 10))
+        .animate(_soldierController));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _soldierControllers.forEach((_soldierController) => _soldierController.dispose());
+  }
+
   Widget get cellType {
-    if (cell.isMiddleCell) {
+    if (widget.cell.isMiddleCell) {
       return MiddleCell(
-          id: cell.id,
-          isRotated: cell.id == 'whiteMiddleCell',
-          soldiers: cell.soldiers);
-    } else if (cell.isExitCell) {
+        id: widget.cell.id,
+        isRotated: widget.cell.id == 'whiteMiddleCell',
+        soldierAnimations: _soldierAnimations,
+        soldiers: widget.cell.soldiers,
+      );
+    } else if (widget.cell.isExitCell) {
       return ExitCell(
-          id: cell.id,
-          isPossibleMove: cell.isPossibleMove,
-          isRotated: cell.id == 'whiteExitCell',
-          soldiers: cell.soldiers);
+        id: widget.cell.id,
+        isPossibleMove: widget.cell.isPossibleMove,
+        isRotated: widget.cell.id == 'whiteExitCell',
+        soldiers: widget.cell.soldiers,
+        soldierAnimations: _soldierAnimations,
+      );
     } else {
       return TriangleCell(
-          id: cell.id,
-          isRotated: int.parse(cell.id) > 12,
-          soldiers: cell.soldiers,
-          isPossibleMove: cell.isPossibleMove,
-          );
+        id: widget.cell.id,
+        isRotated: int.parse(widget.cell.id) > 12,
+        soldiers: widget.cell.soldiers,
+        isPossibleMove: widget.cell.isPossibleMove,
+        soldierAnimations: _soldierAnimations,
+      );
     }
   }
 
@@ -40,7 +69,7 @@ class Cell extends StatelessWidget {
     return GestureDetector(
       child: cellType,
       onTap: () {
-        gameProvider.onCellClick(cell);
+        gameProvider.onCellClick(widget.cell, _soldierControllers.last);
       },
     );
   }

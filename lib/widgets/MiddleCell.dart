@@ -8,8 +8,9 @@ class MiddleCell extends StatelessWidget {
   final String id;
   final bool isRotated;
   final List<SoldierEntity> soldiers;
+  final List<Animation> soldierAnimations;
 
-  MiddleCell({this.id, this.isRotated, this.soldiers});
+  MiddleCell({this.id, this.isRotated, this.soldiers, this.soldierAnimations});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class MiddleCell extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier, isRotated)).toList(),
+                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier, isRotated, soldierAnimation)).toList(),
               ],
             ),
           )

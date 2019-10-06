@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 class Soldier extends StatelessWidget {
   final SoldierEntity soldier;
   final bool isRotated;
+  final Animation soldierAnimation;
 
-  Soldier(this.soldier, this.isRotated);
+  Soldier(this.soldier, this.isRotated, this.soldierAnimation);
 
   Color get _soldierBorderColor {
     if (soldier.isSelected) {
@@ -35,13 +36,23 @@ class Soldier extends StatelessWidget {
           ));
     else
       return Container(
-        height: boardConstants.soldierRadius * 2,
         width: boardConstants.soldierRadius * 2,
-        decoration: BoxDecoration(
-          color: soldier.color,
-          borderRadius: BorderRadius.circular(boardConstants.soldierRadius),
-          border: Border.all(color: _soldierBorderColor, width: 2),
-        ),
+        height: boardConstants.soldierRadius * 2,
+        child: Stack(children: <Widget>[
+          SlideTransition(
+            position: soldierAnimation,
+            child: Container(
+              height: boardConstants.soldierRadius * 2,
+              width: boardConstants.soldierRadius * 2,
+              decoration: BoxDecoration(
+                color: soldier.color,
+                borderRadius:
+                    BorderRadius.circular(boardConstants.soldierRadius),
+                border: Border.all(color: _soldierBorderColor, width: 2),
+              ),
+            ),
+          ),
+        ]),
       );
   }
 }

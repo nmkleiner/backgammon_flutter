@@ -10,8 +10,9 @@ class ExitCell extends StatelessWidget {
   final bool isRotated;
   final List<SoldierEntity> soldiers;
   final bool isPossibleMove;
+  final List<Animation> soldierAnimations;
 
-  ExitCell({this.id, this.isRotated, this.soldiers, this.isPossibleMove});
+  ExitCell({this.id, this.isRotated, this.soldiers, this.isPossibleMove, this.soldierAnimations});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class ExitCell extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 if (soldiers.isNotEmpty)
-                  ...soldiers.map((soldier) => Soldier(soldier, isRotated)).toList(),
+                  ...soldiers.asMap().map((index, soldier) => Soldier(soldier, isRotated, soldierAnimations[index])).values.toList(),
               ],
             ),
           )

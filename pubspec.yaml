@@ -37,13 +37,13 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-  assets:
-   - assets/audio/dice.mp3
-   - assets/audio/eat.wav
-   - assets/audio/move.wav
-   - assets/audio/msg.wav
-   - assets/audio/win.wav
-   - assets/audio/yourTurn.wav
+#  assets:
+#   - assets/audio/dice.mp3
+#   - assets/audio/eat.wav
+#   - assets/audio/move.wav
+#   - assets/audio/msg.wav
+#   - assets/audio/win.wav
+#   - assets/audio/yourTurn.wav
   uses-material-design: true
 
   # The following line ensures that the Material Icons font is
