@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 
 import 'Soldier.dart';
 
+
 class TriangleCell extends StatelessWidget {
   final String id;
   final isRotated;
-  final List<SoldierEntity> soldiers;
   final bool isPossibleMove;
-  final Animation soldierAnimation;
+  final List<SoldierEntity> soldiers;
 
-  TriangleCell(
-      {this.id,
-      this.isRotated,
-      this.soldiers,
-      this.isPossibleMove,
-      this.soldierAnimation});
+  TriangleCell({
+    this.id,
+    this.isRotated,
+    this.isPossibleMove,
+    this.soldiers,
+  });
 
   Color get color {
     if (isPossibleMove) {
@@ -62,11 +62,7 @@ class TriangleCell extends StatelessWidget {
               runAlignment: WrapAlignment.center,
               textDirection: TextDirection.rtl,
               children: <Widget>[
-                if (soldiers.isNotEmpty)
-                  ...soldiers
-                      .map((soldier) =>
-                          Soldier(soldier, isRotated, soldierAnimation))
-                      .toList(),
+                if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)),
               ],
             ),
           ),

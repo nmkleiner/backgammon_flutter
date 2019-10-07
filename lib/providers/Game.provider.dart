@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 
 class GameProvider with ChangeNotifier {
   SoldierEntity selectedSoldier;
-  AnimationController selectedSoldierController;
   CellEntity selectedSoldierCell;
   bool thereIsSelectedSoldier = false;
   Color currentTurn = Colors.black;
@@ -115,8 +114,7 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void onCellClick(
-      CellEntity clickedCell, AnimationController soldierController) {
+  void onCellClick(CellEntity clickedCell) {
     if (!thereIsSelectedSoldier &&
             clickedCell.soldiers.isNotEmpty &&
             currentTurn == clickedCell.soldiers.last.color &&
@@ -124,18 +122,19 @@ class GameProvider with ChangeNotifier {
         // && currentTurn == loggedInUser['color']
         ) {
       // -  select soldier.
-      _selectLastSoldierInCell(clickedCell, soldierController);
-
+      _selectLastSoldierInCell(clickedCell);
       return;
     } else if (thereIsSelectedSoldier && !clickedCell.isPossibleMove) {
       // -  unSelect soldier
       _unselectSelectedSoldier();
     } else if (thereIsSelectedSoldier && clickedCell.isPossibleMove) {
       // -  move soldier.
-      selectedSoldierController.forward();
+      selectedSoldier.isMoving = true;
+      notifyListeners();
       Future.delayed(
-        Duration(milliseconds: 500),
+        Duration(milliseconds: 400),
         () => {
+          selectedSoldier.isMoving = false,
           _moveSelectedSoldier(clickedCell),
           _useDices(clickedCell),
           _unselectSelectedSoldier(),
@@ -204,12 +203,11 @@ class GameProvider with ChangeNotifier {
   }
 
   void _selectLastSoldierInCell(
-      CellEntity cell, AnimationController soldierController) {
+      CellEntity cell) {
     selectedSoldierCell = cell;
     selectedSoldier = cell.soldiers.last;
     selectedSoldier.isSelected = true;
     thereIsSelectedSoldier = true;
-    selectedSoldierController = soldierController;
     _setPossibleMoveCells();
     notifyListeners();
   }
