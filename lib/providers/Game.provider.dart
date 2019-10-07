@@ -132,14 +132,13 @@ class GameProvider with ChangeNotifier {
       selectedSoldier.isMoving = true;
       notifyListeners();
       Future.delayed(
-        Duration(milliseconds: 400),
+        Duration(milliseconds: 300),
         () => {
           selectedSoldier.isMoving = false,
           _moveSelectedSoldier(clickedCell),
           _useDices(clickedCell),
           _unselectSelectedSoldier(),
           _resetPossibleMoveCells(),
-          notifyListeners(),
           _checkIfEndGame(),
           _checkIfEndTurnByDices(),
         },

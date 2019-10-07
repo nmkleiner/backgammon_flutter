@@ -20,11 +20,17 @@ class _SoldierState extends State<Soldier> with TickerProviderStateMixin {
     super.initState();
     soldierController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 400),
-      reverseDuration: Duration(seconds: 0),
+      duration: Duration(milliseconds: 300),
+      reverseDuration: Duration(seconds: 300),
     );
-    _soldierAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 0.5))
+    _soldierAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 2))
         .animate(soldierController);
+  }
+
+  @override
+  void dispose() {
+    soldierController.dispose();
+    super.dispose();
   }
 
   Color get _soldierBorderColor {
@@ -46,8 +52,8 @@ class _SoldierState extends State<Soldier> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (widget.soldier.isMoving) {
       soldierController.forward();
-      Future.delayed(
-          Duration(milliseconds: 400), () => {soldierController.reverse()});
+      // Future.delayed(
+      //     Duration(milliseconds: 300), () => {soldierController.reverse()});
     }
     final boardConstants = Provider.of<BoardConstants>(context);
     if (isInExitCell)
