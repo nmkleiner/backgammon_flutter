@@ -7,10 +7,9 @@ class SoldierEntity {
   @required Color color;
   List<int> possibleMoves = [];
   bool isMoving = false;
+  bool hasMoved = false;
   bool isSelected = false;
   String cellId;
-
-  //  isLastInCell?,
-
+  
   SoldierEntity({this.id, this.color});
 }

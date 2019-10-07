@@ -12,24 +12,25 @@ class Soldier extends StatefulWidget {
 }
 
 class _SoldierState extends State<Soldier> with TickerProviderStateMixin {
-  AnimationController soldierController;
-  Animation<Offset> _soldierAnimation;
+  AnimationController _moveController;
+  Animation<Offset> _moveAnimation;
 
   @override
   void initState() {
     super.initState();
-    soldierController = AnimationController(
+    _moveController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
       reverseDuration: Duration(seconds: 300),
     );
-    _soldierAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 2))
-        .animate(soldierController);
+
+    _moveAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 1))
+        .animate(_moveController);
   }
 
   @override
   void dispose() {
-    soldierController.dispose();
+    _moveController.dispose();
     super.dispose();
   }
 
@@ -51,10 +52,8 @@ class _SoldierState extends State<Soldier> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (widget.soldier.isMoving) {
-      soldierController.forward();
-      // Future.delayed(
-      //     Duration(milliseconds: 300), () => {soldierController.reverse()});
-    }
+      _moveController.forward();
+    } 
     final boardConstants = Provider.of<BoardConstants>(context);
     if (isInExitCell)
       return Container(
@@ -70,7 +69,7 @@ class _SoldierState extends State<Soldier> with TickerProviderStateMixin {
         height: boardConstants.soldierRadius * 2,
         child: Stack(children: <Widget>[
           SlideTransition(
-            position: _soldierAnimation,
+            position: _moveAnimation,
             child: Container(
               height: boardConstants.soldierRadius * 2,
               width: boardConstants.soldierRadius * 2,
