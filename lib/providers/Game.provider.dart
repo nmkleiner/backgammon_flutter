@@ -140,26 +140,10 @@ class GameProvider with ChangeNotifier {
           _unselectSelectedSoldier(),
           _resetPossibleMoveCells(),
           notifyListeners(),
+          _checkIfEndGame(),
+          _checkIfEndTurnByDices(),
         },
       );
-
-      bool endGame = _checkIfEndGame();
-      if (endGame) {
-        _endGame();
-        isMars = _checkIfMars();
-
-        if (isMars) {
-          isTurkishMars = _checkIfTurkishMars();
-        }
-        notifyListeners();
-        return;
-      }
-
-      bool endTurn = _checkIfEndTurnByDices();
-      if (!endTurn) {
-        List<int> possibleMoves = _calculatePossibleMoves();
-        _checkIfEndTurnByPossibleMoves(possibleMoves);
-      }
     }
     notifyListeners();
   }
@@ -202,8 +186,7 @@ class GameProvider with ChangeNotifier {
     middleCell.soldiers.add(eatenSoldier);
   }
 
-  void _selectLastSoldierInCell(
-      CellEntity cell) {
+  void _selectLastSoldierInCell(CellEntity cell) {
     selectedSoldierCell = cell;
     selectedSoldier = cell.soldiers.last;
     selectedSoldier.isSelected = true;
@@ -246,12 +229,20 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  bool _checkIfEndTurnByDices() {
+  void _checkIfEndTurnByDices() {
+    bool isEndTurn;
     if (dices[0].isUsed && dices[1].isUsed) {
       _endTurn();
-      return true;
+      isEndTurn = true;
+    } else {
+      isEndTurn = false;
     }
-    return false;
+
+    if (!isEndTurn) {
+      List<int> possibleMoves = _calculatePossibleMoves();
+      _checkIfEndTurnByPossibleMoves(possibleMoves);
+    }
+    notifyListeners();
   }
 
   void _endTurn() {
@@ -269,11 +260,20 @@ class GameProvider with ChangeNotifier {
     return soldiers;
   }
 
-  bool _checkIfEndGame() {
+  void _checkIfEndGame() {
     CellEntity exitCell = currentTurn == Colors.white
         ? gameService.getCellById('whiteExitCell', cells)
         : gameService.getCellById('blackExitCell', cells);
-    return exitCell.soldiers.length == 15;
+    bool isEndGame = exitCell.soldiers.length == 15;
+    if (isEndGame) {
+      _endGame();
+      isMars = _checkIfMars();
+      if (isMars) {
+        isTurkishMars = _checkIfTurkishMars();
+      }
+      return;
+    }
+    notifyListeners();
   }
 
   bool _checkIfMars() {
