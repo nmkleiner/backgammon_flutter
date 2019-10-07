@@ -31,7 +31,7 @@ class _CellState extends State<Cell> with TickerProviderStateMixin {
 
     // _soldierAnimations = _soldierControllers.map((_soldierController) => Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 10))
     //     .animate(_soldierController));
-    _soldierController = AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _soldierController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     _soldierAnimation = Tween<Offset>(begin: Offset(0, 0), end: Offset(0, 0.5))
         .animate(_soldierController);
   }
