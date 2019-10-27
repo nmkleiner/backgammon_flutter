@@ -2,15 +2,32 @@ import '../entities/Cell.entity.dart';
 import 'package:flutter/material.dart';
 
 class GameService {
+
+  // Map<String, Map<String, dynamic>> boardMap = {
+  //   '1': {'amount': 2, 'color': Colors.white},
+  //   '6': {'amount': 5, 'color': Colors.black},
+  //   '8': {'amount': 3, 'color': Colors.black},
+  //   '12': {'amount': 5, 'color': Colors.white},
+  //   '13': {'amount': 5, 'color': Colors.black},
+  //   '17': {'amount': 3, 'color': Colors.white},
+  //   '19': {'amount': 5, 'color': Colors.white},
+  //   '24': {'amount': 2, 'color': Colors.black},
+  // };
+
   Map<String, Map<String, dynamic>> boardMap = {
     '1': {'amount': 2, 'color': Colors.white},
     '6': {'amount': 5, 'color': Colors.black},
     '8': {'amount': 3, 'color': Colors.black},
     '12': {'amount': 5, 'color': Colors.white},
-    '13': {'amount': 5, 'color': Colors.black},
+    'blackMiddleCell': {'amount': 2, 'color': Colors.black},
     '17': {'amount': 3, 'color': Colors.white},
-    '19': {'amount': 5, 'color': Colors.white},
-    '24': {'amount': 2, 'color': Colors.black},
+    '19': {'amount': 2, 'color': Colors.white},
+    '20': {'amount': 2, 'color': Colors.white},
+    '21': {'amount': 2, 'color': Colors.white},
+    '22': {'amount': 2, 'color': Colors.white},
+    '23': {'amount': 2, 'color': Colors.white},
+    '24': {'amount': 2, 'color': Colors.white},
+    
   };
 
 //   Map<String, Map<String, dynamic>> boardMapForGameEndTesting = {

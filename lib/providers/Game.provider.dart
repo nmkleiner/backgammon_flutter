@@ -110,7 +110,11 @@ class GameProvider with ChangeNotifier {
     // dices[1].number = 1;
     _swapDices();
     _setDoubleCount();
-    _calculatePossibleMoves();
+    List<int> possibleMoves = _calculatePossibleMoves();
+    Future.delayed(Duration(milliseconds: 800), () => {
+    _checkIfEndTurnByPossibleMoves(possibleMoves),
+    notifyListeners()
+    });
     notifyListeners();
   }
 

@@ -55,11 +55,11 @@ class TriangleCell extends StatelessWidget {
           Container(
             height: boardConstants.cellHeight,
             width: boardConstants.cellWidth,
-            child: Wrap(
-              direction: Axis.vertical,
+            child: Column(
+              // direction: Axis.vertical,
               verticalDirection: VerticalDirection.down,
-              alignment: WrapAlignment.start,
-              runAlignment: WrapAlignment.center,
+              // alignment: WrapAlignment.start,
+              // runAlignment: WrapAlignment.center,
               textDirection: TextDirection.rtl,
               children: <Widget>[
                 if (soldiers.isNotEmpty) ...soldiers.map((soldier) => Soldier(soldier)),
