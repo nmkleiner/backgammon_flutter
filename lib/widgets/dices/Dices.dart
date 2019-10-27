@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:backgammon/providers/Game.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../entities/Dice.entity.dart';
 import '../../providers/BoardConstants.provider.dart';
 import './Dice.dart';
@@ -16,6 +15,12 @@ class Dices extends StatefulWidget {
 class _DicesState extends State<Dices> with TickerProviderStateMixin {
   AnimationController _angleController;
   Animation<double> _angleAnimation;
+
+  void _rollDices(dices, channel) {
+    _rollDice(dices[1]);
+    _rollDice(dices[0]);
+    channel.sink.add('balablabla');
+  }
 
   void _rollDice(DiceEntity dice) {
     _angleController.forward();
@@ -41,8 +46,7 @@ class _DicesState extends State<Dices> with TickerProviderStateMixin {
     final boardConstants = Provider.of<BoardConstants>(context, listen: false);
     final gameProvider = Provider.of<GameProvider>(context);
     if (gameProvider.dicesRolling) {
-      _rollDice(gameProvider.dices[0]);
-      _rollDice(gameProvider.dices[1]);
+      _rollDices(gameProvider.dices, gameProvider.channel);
     }
 
     return Container(

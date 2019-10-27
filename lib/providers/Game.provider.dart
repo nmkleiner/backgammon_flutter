@@ -5,7 +5,11 @@ import 'package:backgammon/entities/Dice.entity.dart';
 import 'package:backgammon/entities/Soldier.entity.dart';
 import 'package:backgammon/services/game.service.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 //import '../services/AudioPlayer.dart'
+
 
 class GameProvider with ChangeNotifier {
   SoldierEntity selectedSoldier;
@@ -65,16 +69,24 @@ class GameProvider with ChangeNotifier {
     CellEntity(id: 'whiteExitCell', isExitCell: true)
   ];
 
+  WebSocketChannel channel =
+      IOWebSocketChannel.connect('ws://echo.websocket.org');
+
+  
+
   GameService gameService = GameService();
 
   GameProvider() {
     _setBoard();
+    channel.stream.listen((data) {
+      print(data);
+    });
     // rollDices();
   }
 
   void rollDices() {
     duringTurn = true;
-//    player.play('dice.mp3');
+    // player.play('dice.mp3');
     dices[0].isUsed = false;
     dices[1].isUsed = false;
     dicesRolling = true;
